@@ -1,0 +1,109 @@
+/* ========================================
+   PREDICT.CSS - 预测模块样式
+   职责：材料预测页面特有样式
+   ======================================== */
+
+.predict-config-wrapper {
+  margin-bottom: var(--spacing-xl);
+}
+
+.config-card {
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+}
+
+.config-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-gray-800);
+  margin-bottom: var(--spacing-md);
+}
+
+.config-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-md);
+}
+
+.form-actions {
+  display: flex;
+  gap: var(--spacing-md);
+  padding-top: var(--spacing-sm);
+}
+
+.btn-predict {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 12px 24px;
+  background-color: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--transition-base);
+}
+
+.btn-predict:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.result-section {
+  margin-top: var(--spacing-xl);
+}
+
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.result-title {
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+.material-name {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.material-desc {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+}
+
+.confidence-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.confidence-bar {
+  width: 100px;
+  height: 6px;
+  background-color: var(--color-gray-200);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.confidence-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-success));
+  border-radius: 3px;
+  transition: width var(--transition-slow);
+}

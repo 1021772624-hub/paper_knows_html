@@ -1,0 +1,118 @@
+/* ========================================
+   SIDEBAR.CSS - 侧边栏模块样式
+   职责：Logo、统计信息、导航、设置区域
+   ======================================== */
+
+/* Logo 区域 */
+.sidebar-logo {
+  padding: var(--spacing-lg) var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo-title {
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-gray-800);
+  margin-bottom: var(--spacing-xs);
+}
+
+.logo-subtitle {
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  font-weight: 400;
+}
+
+/* 统计信息区域 */
+.sidebar-stats {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-sm) 0;
+  font-size: var(--font-size-base);
+}
+
+.stat-label {
+  color: var(--color-gray-500);
+}
+
+.stat-value {
+  font-weight: 600;
+  color: var(--color-gray-800);
+}
+
+/* 导航区域 */
+.sidebar-nav {
+  flex: 1;
+  padding: var(--spacing-md) 0;
+}
+
+.nav-list {
+  list-style: none;
+}
+
+.nav-item {
+  margin-bottom: var(--spacing-xs);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 10px var(--spacing-md);
+  color: var(--color-gray-500);
+  text-decoration: none;
+  font-size: var(--font-size-base);
+  transition: all var(--transition-base);
+  border-radius: var(--border-radius-sm);
+  margin: 0 var(--spacing-sm);
+}
+
+.nav-link:hover {
+  background-color: var(--bg-hover);
+  color: var(--color-gray-800);
+}
+
+.nav-link.active {
+  background-color: var(--color-primary);
+  color: white;
+  font-weight: 500;
+}
+
+.nav-link i {
+  margin-right: var(--spacing-md);
+  font-size: 18px;
+}
+
+/* 设置区域 */
+.sidebar-footer {
+  padding: var(--spacing-md);
+  border-top: 1px solid var(--border-color);
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  background-color: var(--color-gray-50);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+  color: var(--color-gray-500);
+  transition: background-color var(--transition-base);
+}
+
+.theme-toggle:hover {
+  background-color: var(--color-gray-100);
+}
+
+.version-info {
+  text-align: center;
+  font-size: var(--font-size-xs);
+  color: var(--color-gray-400);
+}

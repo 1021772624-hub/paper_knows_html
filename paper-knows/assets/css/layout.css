@@ -1,0 +1,48 @@
+/* ========================================
+   LAYOUT.CSS - 整体布局样式
+   职责：Sidebar + Main Content 的布局结构
+   ======================================== */
+
+/* 应用容器 */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+/* Sidebar 布局 */
+.sidebar {
+  width: 260px;
+  background-color: var(--bg-white);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  height: 100vh;
+  left: 0;
+  top: 0;
+  z-index: 100;
+}
+
+/* Main Content 布局 */
+.main-content {
+  margin-left: 260px;
+  flex: 1;
+  padding: var(--spacing-xl);
+  min-height: 100vh;
+}
+
+/* 响应式布局（可选，暂时保留占位） */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    transition: transform var(--transition-base);
+  }
+
+  .sidebar.active {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+}

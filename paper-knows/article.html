@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>文章详情 - 材知道 Paper Knows</title>
+
+  <!-- CSS 引入 -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/modules/sidebar.css">
+  <link rel="stylesheet" href="assets/css/modules/header.css">
+
+  <!-- Markdown 渲染样式 -->
+  <style>
+    .article-content {
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-xl);
+      margin-bottom: var(--spacing-xl);
+      line-height: 1.8;
+    }
+
+    .article-content h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--color-gray-800);
+      margin-top: var(--spacing-xl);
+      margin-bottom: var(--spacing-md);
+      padding-bottom: var(--spacing-sm);
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .article-content h2 {
+      font-size: 20px;
+      font-weight: 600;
+      color: var(--color-gray-800);
+      margin-top: var(--spacing-lg);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .article-content h3 {
+      font-size: 18px;
+      font-weight: 600;
+      color: var(--color-gray-700);
+      margin-top: var(--spacing-md);
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .article-content p {
+      margin-bottom: var(--spacing-md);
+      color: var(--color-gray-700);
+    }
+
+    .article-content ul, .article-content ol {
+      margin-bottom: var(--spacing-md);
+      padding-left: var(--spacing-lg);
+      list-style: disc;
+    }
+
+    .article-content li {
+      margin-bottom: var(--spacing-sm);
+      color: var(--color-gray-700);
+    }
+
+    .article-content strong {
+      font-weight: 600;
+      color: var(--color-gray-800);
+    }
+
+    .article-content code {
+      background-color: var(--color-gray-100);
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.9em;
+    }
+
+    .article-meta {
+      display: flex;
+      gap: var(--spacing-md);
+      align-items: center;
+      margin-bottom: var(--spacing-lg);
+      flex-wrap: wrap;
+    }
+
+    .article-tags {
+      display: flex;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .references-section {
+      background-color: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-xl);
+    }
+
+    .references-title {
+      font-size: var(--font-size-xl);
+      font-weight: 600;
+      color: var(--color-gray-800);
+      margin-bottom: var(--spacing-md);
+    }
+
+    .reference-item {
+      padding: var(--spacing-md);
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color var(--transition-base);
+    }
+
+    .reference-item:last-child {
+      border-bottom: none;
+    }
+
+    .reference-item:hover {
+      background-color: var(--bg-hover);
+    }
+
+    .reference-title {
+      font-size: var(--font-size-base);
+      font-weight: 500;
+      color: var(--color-gray-800);
+      margin-bottom: var(--spacing-xs);
+    }
+
+    .reference-meta {
+      font-size: var(--font-size-sm);
+      color: var(--color-gray-500);
+    }
+
+    .back-button {
+      margin-bottom: var(--spacing-lg);
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- MODULE: SIDEBAR -->
+    <aside class="sidebar">
+      <!-- Logo 区域 -->
+      <div class="sidebar-logo">
+        <div class="logo-title">材知道</div>
+        <div class="logo-subtitle">Paper Knows</div>
+      </div>
+
+      <!-- 统计信息区域 -->
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-label">总文献</span>
+          <span class="stat-value">6</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">已读</span>
+          <span class="stat-value">1</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">AI 精读</span>
+          <span class="stat-value">6</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">实验方案</span>
+          <span class="stat-value">6</span>
+        </div>
+      </div>
+
+      <!-- 导航区域 -->
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="recommend.html" class="nav-link active">
+              <span>智慧推荐</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link">
+              <span>我的文献库</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="predict.html" class="nav-link">
+              <span>材料预测</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 设置区域 -->
+      <div class="sidebar-footer">
+        <div class="theme-toggle" id="theme-toggle">
+          <span>切换深浅色模式</span>
+          <span>🌙</span>
+        </div>
+        <div class="version-info">v1.0.0 MVP</div>
+      </div>
+    </aside>
+    <!-- END MODULE: SIDEBAR -->
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+
+      <!-- 返回按钮 -->
+      <div class="back-button">
+        <button class="btn btn-secondary" onclick="history.back()">
+          ← 返回推荐列表
+        </button>
+      </div>
+
+      <!-- 文章头部 -->
+      <div class="page-header">
+        <h1 class="page-title" id="article-title">加载中...</h1>
+        <div class="article-meta">
+          <span class="text-muted" id="article-date"></span>
+          <span class="badge badge-info" id="article-confidence"></span>
+          <span class="text-muted" id="article-source-count"></span>
+        </div>
+        <div class="article-tags" id="article-tags"></div>
+      </div>
+
+      <!-- 文章正文 -->
+      <div class="article-content" id="article-content">
+        <p>正在加载文章内容...</p>
+      </div>
+
+      <!-- 引用文献 -->
+      <div class="references-section">
+        <h3 class="references-title">引用文献</h3>
+        <div id="references-list">
+          <p class="text-muted">加载中...</p>
+        </div>
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript 引入 -->
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/article.js"></script>
+</body>
+</html>

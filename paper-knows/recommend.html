@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智慧推荐 - 材知道 Paper Knows</title>
+
+  <!-- CSS 引入 -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/modules/sidebar.css">
+  <link rel="stylesheet" href="assets/css/modules/header.css">
+  <link rel="stylesheet" href="assets/css/modules/stat-cards.css">
+  <link rel="stylesheet" href="assets/css/modules/recommend.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- MODULE: SIDEBAR -->
+    <aside class="sidebar">
+      <!-- Logo 区域 -->
+      <div class="sidebar-logo">
+        <div class="logo-title">材知道</div>
+        <div class="logo-subtitle">Paper Knows</div>
+      </div>
+
+      <!-- 统计信息区域 -->
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-label">总文献</span>
+          <span class="stat-value">6</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">已读</span>
+          <span class="stat-value">1</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">AI 精读</span>
+          <span class="stat-value">6</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">实验方案</span>
+          <span class="stat-value">6</span>
+        </div>
+      </div>
+
+      <!-- 导航区域 -->
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="recommend.html" class="nav-link active">
+              <span>智慧推荐</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link">
+              <span>我的文献库</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="predict.html" class="nav-link">
+              <span>材料预测</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 设置区域 -->
+      <div class="sidebar-footer">
+        <div class="theme-toggle" id="theme-toggle">
+          <span>切换深浅色模式</span>
+          <span>🌙</span>
+        </div>
+        <div class="version-info">v1.0.0 MVP</div>
+      </div>
+    </aside>
+    <!-- END MODULE: SIDEBAR -->
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+
+      <!-- MODULE: PAGE_HEADER -->
+      <div class="page-header">
+        <h1 class="page-title">智慧推荐</h1>
+        <p class="page-subtitle">基于近期文献与研究方向的智能推荐</p>
+      </div>
+      <!-- END MODULE: PAGE_HEADER -->
+
+      <!-- MODULE: STAT_CARDS -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-label">推荐文献</div>
+          <div class="stat-card-value">12</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">研究方向</div>
+          <div class="stat-card-value">5</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">实验方案</div>
+          <div class="stat-card-value">8</div>
+        </div>
+      </div>
+      <!-- END MODULE: STAT_CARDS -->
+
+      <!-- MODULE: RECOMMEND_LIST -->
+      <div class="recommend-list">
+
+        <!-- 推荐项示例 1 -->
+        <div class="recommend-item">
+          <div class="recommend-header">
+            <div class="recommend-type-wrapper">
+              <span class="badge badge-info">推荐文献</span>
+              <span class="recommend-score">匹配度: 95%</span>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-primary btn-add-library">加入文献库</button>
+              <button class="btn btn-sm btn-secondary">查看详情</button>
+            </div>
+          </div>
+          <h3 class="recommend-title">Advanced Characterization of SiC/SiC Composites for Nuclear Applications</h3>
+          <div class="recommend-meta">
+            <span class="meta-item">John Smith 等</span>
+            <span class="meta-item">2025</span>
+            <span class="meta-item">ceramic composites, nuclear materials</span>
+          </div>
+          <div class="recommend-reason">
+            <strong>推荐理由：</strong>
+            与您近期阅读的 SiC/SiC 复合材料研究高度相关，该文献深入探讨了核能应用场景下的材料表征方法。
+          </div>
+        </div>
+
+        <!-- 推荐项示例 2 -->
+        <div class="recommend-item">
+          <div class="recommend-header">
+            <div class="recommend-type-wrapper">
+              <span class="badge badge-success">研究方向</span>
+              <span class="recommend-score">匹配度: 88%</span>
+            </div>
+            <div>
+              <button class="btn btn-sm btn-primary">标记关注</button>
+              <button class="btn btn-sm btn-secondary">查看详情</button>
+            </div>
+          </div>
+          <h3 class="recommend-title">木材复合材料的多尺度力学建模</h3>
+          <div class="recommend-meta">
+            <span class="meta-item">新兴研究方向</span>
+            <span class="meta-item">相关文献 23 篇</span>
+          </div>
+          <div class="recommend-reason">
+            <strong>推荐理由：</strong>
+            基于您对木材泊松比测定的研究兴趣，该方向结合有限元分析与实验验证，具有较高的研究价值。
+          </div>
+        </div>
+
+      </div>
+      <!-- END MODULE: RECOMMEND_LIST -->
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript 引入 -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/recommend.js"></script>
+</body>
+</html>

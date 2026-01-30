@@ -1,0 +1,51 @@
+/* ========================================
+   TABLE.CSS - 表格模块样式
+   职责：内容展示表格样式
+   ======================================== */
+
+.content-table-wrapper {
+  background-color: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+.content-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.content-table thead {
+  background-color: var(--color-gray-50);
+}
+
+.content-table th {
+  padding: var(--spacing-md);
+  text-align: left;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-gray-500);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-table td {
+  padding: var(--spacing-md);
+  font-size: var(--font-size-base);
+  color: var(--color-gray-800);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.content-table tbody tr:hover {
+  background-color: var(--bg-hover);
+}
+
+.paper-title {
+  font-weight: 500;
+  color: var(--color-gray-800);
+  max-width: 400px;
+}
+
+.action-buttons {
+  display: flex;
+  gap: var(--spacing-sm);
+}

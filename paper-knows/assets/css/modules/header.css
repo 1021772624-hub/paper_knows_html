@@ -1,0 +1,20 @@
+/* ========================================
+   HEADER.CSS - 页面头部模块样式
+   职责：页面标题、副标题
+   ======================================== */
+
+.page-header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.page-title {
+  font-size: var(--font-size-3xl);
+  font-weight: 700;
+  color: var(--color-gray-800);
+  margin-bottom: var(--spacing-sm);
+}
+
+.page-subtitle {
+  font-size: var(--font-size-base);
+  color: var(--color-gray-500);
+}

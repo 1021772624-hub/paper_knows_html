@@ -1,0 +1,105 @@
+{
+  "stats": {
+    "totalMaterials": 18,
+    "highPotential": 5,
+    "experimentalDirections": 3
+  },
+  "predictions": [
+    {
+      "id": "pred_001",
+      "materialName": "SiC/SiC-BN 复合界面层材料",
+      "materialDesc": "基于 CVI+PIP 混合工艺",
+      "predictedProperties": {
+        "primary": "弯曲强度: 450-520 MPa",
+        "secondary": "抗氧化温度: 1400-1500 K"
+      },
+      "confidence": 92,
+      "experimentalDirections": [
+        "界面层厚度优化",
+        "热处理温度窗口研究"
+      ],
+      "materialSystem": "ceramic",
+      "targetProperty": "mechanical"
+    },
+    {
+      "id": "pred_002",
+      "materialName": "改性云杉木材复合材料",
+      "materialDesc": "泊松比优化设计",
+      "predictedProperties": {
+        "primary": "泊松比: 0.42-0.48",
+        "secondary": "弹性模量: 12-15 GPa"
+      },
+      "confidence": 85,
+      "experimentalDirections": [
+        "压缩试验方法验证",
+        "多尺度力学建模"
+      ],
+      "materialSystem": "wood",
+      "targetProperty": "mechanical"
+    },
+    {
+      "id": "pred_003",
+      "materialName": "高温陶瓷基复合材料",
+      "materialDesc": "SiC 纤维增强体系",
+      "predictedProperties": {
+        "primary": "热导率: 15-20 W/(m·K)",
+        "secondary": "热膨胀系数: 3.5-4.2×10⁻⁶/K"
+      },
+      "confidence": 88,
+      "experimentalDirections": [
+        "高温热物理性能测试",
+        "纤维-基体界面优化"
+      ],
+      "materialSystem": "ceramic",
+      "targetProperty": "thermal"
+    },
+    {
+      "id": "pred_004",
+      "materialName": "聚合物基复合材料",
+      "materialDesc": "碳纤维/环氧树脂体系",
+      "predictedProperties": {
+        "primary": "拉伸强度: 800-950 MPa",
+        "secondary": "断裂韧性: 45-55 MPa·m^0.5"
+      },
+      "confidence": 79,
+      "experimentalDirections": [
+        "固化工艺参数优化",
+        "层间增韧改性研究"
+      ],
+      "materialSystem": "polymer",
+      "targetProperty": "mechanical"
+    },
+    {
+      "id": "pred_005",
+      "materialName": "木质复合材料",
+      "materialDesc": "定向刨花板改性体系",
+      "predictedProperties": {
+        "primary": "弯曲强度: 35-42 MPa",
+        "secondary": "吸水厚度膨胀率: 8-12%"
+      },
+      "confidence": 82,
+      "experimentalDirections": [
+        "胶粘剂配方优化",
+        "防水性能提升研究"
+      ],
+      "materialSystem": "wood",
+      "targetProperty": "mechanical"
+    },
+    {
+      "id": "pred_006",
+      "materialName": "陶瓷基复合材料",
+      "materialDesc": "氧化铝增强体系",
+      "predictedProperties": {
+        "primary": "断裂韧性: 6-8 MPa·m^0.5",
+        "secondary": "硬度: 18-22 GPa"
+      },
+      "confidence": 90,
+      "experimentalDirections": [
+        "增强相分布优化",
+        "烧结工艺改进"
+      ],
+      "materialSystem": "ceramic",
+      "targetProperty": "mechanical"
+    }
+  ]
+}

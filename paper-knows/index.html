@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>我的文献库 - 材知道 Paper Knows</title>
+
+  <!-- CSS 引入 -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/modules/sidebar.css">
+  <link rel="stylesheet" href="assets/css/modules/header.css">
+  <link rel="stylesheet" href="assets/css/modules/stat-cards.css">
+  <link rel="stylesheet" href="assets/css/modules/filter-bar.css">
+  <link rel="stylesheet" href="assets/css/modules/table.css">
+</head>
+<body>
+  <div class="app-container">
+
+    <!-- MODULE: SIDEBAR -->
+    <aside class="sidebar">
+      <!-- Logo 区域 -->
+      <div class="sidebar-logo">
+        <div class="logo-title">材知道</div>
+        <div class="logo-subtitle">Paper Knows</div>
+      </div>
+
+      <!-- 统计信息区域 -->
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-label">总文献</span>
+          <span class="stat-value">6</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">已读</span>
+          <span class="stat-value">1</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">AI 精读</span>
+          <span class="stat-value">6</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">实验方案</span>
+          <span class="stat-value">6</span>
+        </div>
+      </div>
+
+      <!-- 导航区域 -->
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="recommend.html" class="nav-link">
+              <span>智慧推荐</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link active">
+              <span>我的文献库</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="predict.html" class="nav-link">
+              <span>材料预测</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 设置区域 -->
+      <div class="sidebar-footer">
+        <div class="theme-toggle" id="theme-toggle">
+          <span>切换深浅色模式</span>
+          <span>🌙</span>
+        </div>
+        <div class="version-info">v1.0.0 MVP</div>
+      </div>
+    </aside>
+    <!-- END MODULE: SIDEBAR -->
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+
+      <!-- MODULE: PAGE_HEADER -->
+      <div class="page-header">
+        <h1 class="page-title">文献库</h1>
+        <p class="page-subtitle">管理和组织您的科研文献</p>
+      </div>
+      <!-- END MODULE: PAGE_HEADER -->
+
+      <!-- MODULE: STAT_CARDS -->
+      <div class="stat-cards">
+        <div class="stat-card">
+          <div class="stat-card-label">总文献</div>
+          <div class="stat-card-value">6</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">已读</div>
+          <div class="stat-card-value">1</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">AI 精读</div>
+          <div class="stat-card-value">6</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-card-label">实验方案</div>
+          <div class="stat-card-value">6</div>
+        </div>
+      </div>
+      <!-- END MODULE: STAT_CARDS -->
+
+      <!-- MODULE: FILTER_BAR -->
+      <div class="filter-bar">
+        <div class="filter-item">
+          <label class="filter-label">排序</label>
+          <select class="filter-select" id="filter-sort">
+            <option value="time-desc">导入时间（新到旧）</option>
+            <option value="time-asc">导入时间（旧到新）</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">分类</label>
+          <select class="filter-select" id="filter-category">
+            <option value="all">全部分类</option>
+            <option value="material">材料科学</option>
+          </select>
+        </div>
+        <div class="filter-item">
+          <label class="filter-label">状态</label>
+          <select class="filter-select" id="filter-status">
+            <option value="all">全部状态</option>
+            <option value="read">已读</option>
+            <option value="unread">未读</option>
+          </select>
+        </div>
+      </div>
+      <!-- END MODULE: FILTER_BAR -->
+
+      <!-- MODULE: CONTENT_AREA -->
+      <div class="content-table-wrapper">
+        <table class="content-table">
+          <thead>
+            <tr>
+              <th>标题</th>
+              <th>作者</th>
+              <th>年份</th>
+              <th>导入时间</th>
+              <th>分类</th>
+              <th>状态</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="paper-list">
+            <tr>
+              <td>
+                <div class="paper-title">Effect of Heat Treatment on Microstructure and Mechanical Properties</div>
+              </td>
+              <td>Takashi Nozawa 等</td>
+              <td>2004</td>
+              <td>2026-01-29</td>
+              <td><span class="badge badge-info">材料科学</span></td>
+              <td><span class="badge badge-success">已读</span></td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-primary">详情</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <div class="paper-title">A NEW APPROACH TO DETERMINE THE POISSON'S RATIO OF WOOD</div>
+              </td>
+              <td>Klara Winter 等</td>
+              <td>2026</td>
+              <td>2026-01-29</td>
+              <td><span class="badge badge-info">材料科学</span></td>
+              <td><span class="badge badge-warning">未读</span></td>
+              <td>
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-primary">详情</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- END MODULE: CONTENT_AREA -->
+
+    </main>
+
+  </div>
+
+  <!-- JavaScript 引入 -->
+  <script src="assets/js/mock-data.js"></script>
+  <script src="assets/js/main.js"></script>
+  <script src="assets/js/pages/index.js"></script>
+</body>
+</html>
