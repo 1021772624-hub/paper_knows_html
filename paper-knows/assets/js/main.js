@@ -14,6 +14,9 @@ console.log('[main.js] API_BASE_URL 已加载:', API_BASE_URL);
 function initNavigation() {
   const navLinks = document.querySelectorAll('.nav-link');
 
+  // 根据当前 URL 设置初始 active 状态
+  setActiveNavByUrl();
+
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       // 移除所有 active 状态
@@ -21,6 +24,41 @@ function initNavigation() {
       // 添加当前 active 状态
       this.classList.add('active');
     });
+  });
+}
+
+// 根据当前 URL 设置导航高亮
+function setActiveNavByUrl() {
+  const navLinks = document.querySelectorAll('.nav-link');
+  const currentPath = window.location.pathname;
+  const currentSearch = window.location.search;
+
+  // 移除所有 active 状态
+  navLinks.forEach(l => l.classList.remove('active'));
+
+  // 检查是否是回收站页面
+  if (currentSearch.includes('view=trash')) {
+    const trashLink = document.getElementById('trash-link');
+    if (trashLink) {
+      trashLink.classList.add('active');
+      return;
+    }
+  }
+
+  // 根据当前页面路径设置 active
+  navLinks.forEach(link => {
+    const href = link.getAttribute('href');
+    if (!href) return;
+
+    // 提取链接的路径部分（不包含查询参数）
+    const linkPath = href.split('?')[0];
+    const linkFileName = linkPath.split('/').pop();
+    const currentFileName = currentPath.split('/').pop() || 'index.html';
+
+    // 匹配当前页面
+    if (linkFileName === currentFileName) {
+      link.classList.add('active');
+    }
   });
 }
 

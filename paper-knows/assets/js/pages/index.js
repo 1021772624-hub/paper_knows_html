@@ -934,6 +934,17 @@ document.addEventListener('DOMContentLoaded', async function() {
     trashLink.addEventListener('click', function(e) {
       e.preventDefault();
       console.log('[Event] 点击回收站');
+
+      // 更新 URL 但不重新加载页面
+      const newUrl = new URL(window.location.href);
+      newUrl.searchParams.set('view', 'trash');
+      window.history.pushState({}, '', newUrl);
+
+      // 更新侧边栏高亮状态
+      document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+      this.classList.add('active');
+
+      // 显示回收站
       showTrash();
     });
   }
