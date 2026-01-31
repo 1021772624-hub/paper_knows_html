@@ -1,7 +1,48 @@
 /**
  * RECOMMEND.JS - 智慧推荐页面逻辑
- * 职责：加载文章列表、渲染、跳转
+ * 职责：加载文章列表、渲染、跳转、加载统计数据
  */
+
+// 渲染统计信息
+function renderStats(stats) {
+  console.log('[renderStats] 更新统计信息:', stats);
+
+  // 防御性处理
+  const safeStats = {
+    total: stats?.total || 0,
+    read: stats?.read || 0,
+    ai_analyzed: stats?.ai_analyzed || 0
+  };
+
+  // 更新侧边栏统计信息
+  const sidebarStats = document.querySelectorAll('.sidebar-stats .stat-value');
+  if (sidebarStats.length >= 3) {
+    sidebarStats[0].textContent = safeStats.total;
+    sidebarStats[1].textContent = safeStats.read;
+    sidebarStats[2].textContent = safeStats.ai_analyzed;
+  }
+}
+
+// 从 API 加载统计数据
+async function loadStats() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[loadStats] 接收到统计数据:', data);
+
+    if (data.stats) {
+      renderStats(data.stats);
+    }
+
+  } catch (error) {
+    console.error('[loadStats] 加载统计数据失败:', error);
+  }
+}
 
 // 渲染文章列表
 function renderArticleList(articles) {
@@ -67,6 +108,7 @@ async function loadArticles() {
 
 // 页面初始化
 document.addEventListener('DOMContentLoaded', function() {
-  loadArticles();
+  loadStats();  // 加载统计数据
+  loadArticles();  // 加载文章列表
   console.log('智慧推荐页面已初始化');
 });

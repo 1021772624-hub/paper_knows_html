@@ -11,7 +11,7 @@
 
 /* Sidebar 布局 */
 .sidebar {
-  width: 260px;
+  width: 64px;
   background-color: var(--bg-white);
   border-right: 1px solid var(--border-color);
   display: flex;
@@ -21,14 +21,25 @@
   left: 0;
   top: 0;
   z-index: 100;
+  transition: width 0.3s ease;
+  overflow: hidden;
+}
+
+.sidebar.expanded {
+  width: 200px;
 }
 
 /* Main Content 布局 */
 .main-content {
-  margin-left: 260px;
+  margin-left: 64px;
   flex: 1;
   padding: var(--spacing-xl);
   min-height: 100vh;
+  transition: margin-left 0.3s ease;
+}
+
+.sidebar.expanded ~ .main-content {
+  margin-left: 200px;
 }
 
 /* 响应式布局（可选，暂时保留占位） */

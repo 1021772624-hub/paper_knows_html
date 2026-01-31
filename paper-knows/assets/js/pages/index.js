@@ -9,6 +9,37 @@
  */
 
 let selectedFiles = [];
+let allPapers = []; // 存储所有文献数据
+let currentFilter = 'all'; // 当前筛选类型
+
+// ==================== 快速筛选功能 ====================
+window.applyQuickFilter = function(filterType) {
+  console.log('[applyQuickFilter] 应用筛选:', filterType);
+  currentFilter = filterType;
+
+  let filteredPapers = allPapers;
+
+  switch(filterType) {
+    case 'read':
+      filteredPapers = allPapers.filter(p => p.read === true);
+      break;
+    case 'unread':
+      filteredPapers = allPapers.filter(p => p.read === false);
+      break;
+    case 'ai-analyzed':
+      filteredPapers = allPapers.filter(p => p.ai_analyzed === true);
+      break;
+    case 'analyzing':
+      filteredPapers = allPapers.filter(p => p.ai_analyzed === false);
+      break;
+    case 'all':
+    default:
+      filteredPapers = allPapers;
+      break;
+  }
+
+  renderPaperTable(filteredPapers);
+};
 
 // ==================== 时间格式化函数 ====================
 function formatRelativeTime(dateString) {
@@ -44,16 +75,10 @@ function renderStats(stats) {
   const safeStats = {
     total: stats?.total || 0,
     read: stats?.read || 0,
-    ai_analyzed: stats?.ai_analyzed || 0
+    unread: (stats?.total || 0) - (stats?.read || 0),
+    ai_analyzed: stats?.ai_analyzed || 0,
+    analyzing: (stats?.total || 0) - (stats?.ai_analyzed || 0)
   };
-
-  // 更新主内容区统计卡片
-  const statCards = document.querySelectorAll('.stat-card-value');
-  if (statCards.length >= 3) {
-    statCards[0].textContent = safeStats.total;
-    statCards[1].textContent = safeStats.read;
-    statCards[2].textContent = safeStats.ai_analyzed;
-  }
 
   // 更新侧边栏统计信息
   const sidebarStats = document.querySelectorAll('.sidebar-stats .stat-value');
@@ -62,6 +87,32 @@ function renderStats(stats) {
     sidebarStats[1].textContent = safeStats.read;
     sidebarStats[2].textContent = safeStats.ai_analyzed;
   }
+
+  // 更新快速筛选芯片计数
+  const filterChips = document.querySelectorAll('.filter-chip');
+  filterChips.forEach(chip => {
+    const filterType = chip.getAttribute('data-filter');
+    const countSpan = chip.querySelector('.chip-count');
+    if (countSpan) {
+      switch(filterType) {
+        case 'all':
+          countSpan.textContent = safeStats.total;
+          break;
+        case 'read':
+          countSpan.textContent = safeStats.read;
+          break;
+        case 'unread':
+          countSpan.textContent = safeStats.unread;
+          break;
+        case 'ai-analyzed':
+          countSpan.textContent = safeStats.ai_analyzed;
+          break;
+        case 'analyzing':
+          countSpan.textContent = safeStats.analyzing;
+          break;
+      }
+    }
+  });
 }
 
 // ==================== 文献表格渲染（防御性） ====================
@@ -80,7 +131,7 @@ function renderPaperTable(papers) {
   if (!papers || papers.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align: center; padding: 3rem; color: #666;">
+        <td colspan="7" style="text-align: center; padding: 3rem; color: #666;">
           <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
           <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">暂无文献数据</div>
           <div style="font-size: 0.9rem; color: #999;">点击右上角"导入文献"按钮开始添加 PDF</div>
@@ -100,7 +151,6 @@ function renderPaperTable(papers) {
       const title = paper.title || '未解析标题';
       const journal = paper.journal || '';
       const year = paper.year || '';
-      const category = paper.category || '未分类';
       const isRead = paper.read || false;
       const isAiAnalyzed = paper.ai_analyzed || false;
       const importedAt = paper.imported_at || '';
@@ -108,35 +158,33 @@ function renderPaperTable(papers) {
       // 显示逻辑：AI 分析完成后必须显示解析结果，否则显示「解析中」
       const displayJournal = isAiAnalyzed ? (journal || '-') : (journal || '解析中');
       const displayYear = isAiAnalyzed ? (year || '-') : (year || '解析中');
-      const displayCategory = isAiAnalyzed ? category : '解析中';
       const displayImportDate = formatRelativeTime(importedAt);
 
       row.innerHTML = `
-        <td><input type="checkbox" class="paper-checkbox" data-paper-id="${paperId}" data-ai-analyzed="${isAiAnalyzed}"></td>
-        <td>
-          <div class="paper-title">${title}</div>
+        <td style="text-align: center;"><input type="checkbox" class="paper-checkbox" data-paper-id="${paperId}" data-ai-analyzed="${isAiAnalyzed}"></td>
+        <td style="padding: 0.75rem;">
+          <div class="paper-title" style="font-weight: 500; color: #333;">${title}</div>
         </td>
-        <td>${displayJournal}</td>
-        <td>${displayYear}</td>
-        <td><span class="badge badge-info">${displayCategory}</span></td>
-        <td>${displayImportDate}</td>
-        <td>
+        <td style="padding: 0.75rem; color: #666;">${displayJournal}</td>
+        <td style="text-align: center; padding: 0.75rem; color: #666;">${displayYear}</td>
+        <td style="text-align: center; padding: 0.75rem; color: #666;">${displayImportDate}</td>
+        <td style="text-align: center; padding: 0.75rem;">
           <span class="badge ${isRead ? 'badge-success' : 'badge-secondary'}"
-                style="cursor: pointer;"
+                style="cursor: pointer; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;"
                 data-action="toggle-read"
                 data-paper-id="${paperId}"
                 title="点击切换已读/未读状态">
-            ${isRead ? '已读' : '未读'}
+            ${isRead ? '✓ 已读' : '未读'}
           </span>
         </td>
-        <td>
+        <td style="text-align: center; padding: 0.75rem;">
           ${isAiAnalyzed
-            ? `<span class="badge badge-success" style="margin-right: 0.5rem;">✅ 已分析</span>
-               <button class="btn btn-sm btn-primary" data-action="view-analysis" data-paper-id="${paperId}">查看分析</button>`
-            : `<button class="btn btn-sm btn-primary" data-action="ai-analyze" data-paper-id="${paperId}">🤖 AI 辅助阅读</button>`
+            ? `<span class="badge badge-success" style="margin-right: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;">✅ 已分析</span>
+               <button class="btn btn-sm btn-primary" data-action="view-analysis" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">查看分析</button>`
+            : `<button class="btn btn-sm btn-primary" data-action="ai-analyze" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">🤖 AI 辅助阅读</button>`
           }
-          <button class="btn btn-sm btn-secondary" data-action="view-pdf" data-paper-id="${paperId}">查看 PDF</button>
-          <button class="btn btn-sm btn-danger" data-action="delete-paper" data-paper-id="${paperId}" style="margin-left: 0.5rem;">删除</button>
+          <button class="btn btn-sm btn-secondary" data-action="view-pdf" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; margin-left: 0.25rem;">查看 PDF</button>
+          <button class="btn btn-sm btn-danger" data-action="delete-paper" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; margin-left: 0.25rem;">删除</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -225,10 +273,12 @@ async function loadPapers() {
     }
 
     if (data.papers) {
-      renderPaperTable(data.papers);
+      allPapers = data.papers; // 存储所有文献
+      applyQuickFilter(currentFilter); // 应用当前筛选
       console.log('[loadPapers] 文献列表已加载:', data.papers.length, '篇');
     } else {
       // 即使没有 papers 字段，也要渲染空状态
+      allPapers = [];
       renderPaperTable([]);
     }
 
@@ -240,7 +290,7 @@ async function loadPapers() {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="8" style="text-align: center; padding: 3rem; color: #e74c3c;">
+          <td colspan="7" style="text-align: center; padding: 3rem; color: #e74c3c;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
             <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">加载失败</div>
             <div style="font-size: 0.9rem; color: #999;">请检查后端服务是否启动</div>
@@ -396,9 +446,17 @@ async function showTrash() {
 
     // 更新页面标题
     const pageTitle = document.querySelector('.page-title');
-    const pageSubtitle = document.querySelector('.page-subtitle');
-    if (pageTitle) pageTitle.textContent = '回收站';
-    if (pageSubtitle) pageSubtitle.textContent = '已删除的文献可以在这里恢复或永久删除';
+    if (pageTitle) {
+      pageTitle.innerHTML = '回收站 <button class="btn btn-sm btn-secondary" onclick="location.reload()" style="margin-left: 1rem; padding: 0.4rem 0.8rem; font-size: 0.875rem;">返回文献库</button>';
+    }
+
+    // 隐藏筛选芯片和工具栏
+    const filterChips = document.querySelector('.page-header > div:first-child > div');
+    const actionButtons = document.querySelector('.page-header > div:last-child');
+    const filterBar = document.querySelector('.filter-bar');
+    if (filterChips) filterChips.style.display = 'none';
+    if (actionButtons) actionButtons.style.display = 'none';
+    if (filterBar) filterBar.style.display = 'none';
 
     // 渲染回收站文献列表
     renderTrashTable(data.papers || []);
@@ -424,7 +482,7 @@ function renderTrashTable(papers) {
   if (!papers || papers.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="8" style="text-align: center; padding: 3rem; color: #666;">
+        <td colspan="7" style="text-align: center; padding: 3rem; color: #666;">
           <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
           <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">回收站是空的</div>
           <div style="font-size: 0.9rem; color: #999;">删除的文献会暂时保存在这里</div>
@@ -444,22 +502,20 @@ function renderTrashTable(papers) {
       const title = paper.title || '未解析标题';
       const journal = paper.journal || '-';
       const year = paper.year || '-';
-      const category = paper.category || '未分类';
       const deletedAt = formatRelativeTime(paper.deleted_at);
 
       row.innerHTML = `
-        <td></td>
-        <td>
-          <div class="paper-title">${title}</div>
+        <td style="text-align: center;"></td>
+        <td style="padding: 0.75rem;">
+          <div class="paper-title" style="font-weight: 500; color: #333;">${title}</div>
         </td>
-        <td>${journal}</td>
-        <td>${year}</td>
-        <td><span class="badge badge-info">${category}</span></td>
-        <td>${deletedAt}</td>
-        <td><span class="badge badge-danger">已删除</span></td>
-        <td>
-          <button class="btn btn-sm btn-success" data-action="restore-paper" data-paper-id="${paperId}">恢复</button>
-          <button class="btn btn-sm btn-danger" data-action="permanent-delete" data-paper-id="${paperId}" style="margin-left: 0.5rem;">永久删除</button>
+        <td style="padding: 0.75rem; color: #666;">${journal}</td>
+        <td style="text-align: center; padding: 0.75rem; color: #666;">${year}</td>
+        <td style="text-align: center; padding: 0.75rem; color: #666;">${deletedAt}</td>
+        <td style="text-align: center; padding: 0.75rem;"><span class="badge badge-danger" style="padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;">已删除</span></td>
+        <td style="text-align: center; padding: 0.75rem;">
+          <button class="btn btn-sm btn-success" data-action="restore-paper" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">恢复</button>
+          <button class="btn btn-sm btn-danger" data-action="permanent-delete" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; margin-left: 0.25rem;">永久删除</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -887,6 +943,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     await loadPapers();
   } catch (error) {
     console.error('[DOMContentLoaded] 初始加载失败:', error);
+  }
+
+  // 检查 URL 参数，如果是 view=trash 则显示回收站
+  const urlParams = new URLSearchParams(window.location.search);
+  if (urlParams.get('view') === 'trash') {
+    console.log('[DOMContentLoaded] 检测到 view=trash 参数，显示回收站');
+    showTrash();
   }
 
   console.log('[DOMContentLoaded] 文献库页面初始化完成');

@@ -36,10 +36,59 @@ function initThemeToggle() {
   }
 }
 
+// 侧边栏折叠逻辑
+function initSidebarToggle() {
+  const sidebar = document.querySelector('.sidebar');
+  const sidebarToggle = document.getElementById('sidebar-toggle');
+
+  if (sidebarToggle && sidebar) {
+    // 从 localStorage 读取侧边栏状态
+    const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
+    if (sidebarExpanded) {
+      sidebar.classList.add('expanded');
+    }
+
+    sidebarToggle.addEventListener('click', function() {
+      sidebar.classList.toggle('expanded');
+      // 保存侧边栏状态到 localStorage
+      localStorage.setItem('sidebarExpanded', sidebar.classList.contains('expanded'));
+    });
+  }
+}
+
+// 快速筛选芯片逻辑
+function initFilterChips() {
+  const filterChips = document.querySelectorAll('.filter-chip');
+
+  filterChips.forEach(chip => {
+    chip.addEventListener('click', function() {
+      // 移除所有 active 状态
+      filterChips.forEach(c => {
+        c.style.background = 'white';
+        c.style.color = '#666';
+        c.classList.remove('active');
+      });
+
+      // 添加当前 active 状态
+      this.classList.add('active');
+      this.style.background = '#3498db';
+      this.style.color = 'white';
+
+      // 触发筛选逻辑（如果页面有相关函数）
+      const filterType = this.getAttribute('data-filter');
+      if (typeof window.applyQuickFilter === 'function') {
+        window.applyQuickFilter(filterType);
+      }
+    });
+  });
+}
+
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
   initNavigation();
   initThemeToggle();
+  initSidebarToggle();
+  initFilterChips();
 
   console.log('材知道系统已初始化');
 });
