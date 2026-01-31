@@ -4,81 +4,81 @@ AI 文献分析服务
 """
 import json
 import fitz  # PyMuPDF
+import hashlib
 from pathlib import Path
 from datetime import datetime
 
 
-# AI Prompt 模板 - 深度分析版本
-AI_ANALYSIS_PROMPT = """你是一个专业的科研文献深度分析助手。你的任务是替代人工精读论文，提供全面、深入、结构化的分析结果。
+# AI Prompt 模板 - 简化版本（优化 token 使用）
+AI_ANALYSIS_PROMPT = """你是科研文献分析助手。请分析以下论文并输出 JSON 格式结果。
 
 **重要要求：**
 1. 必须输出严格的 JSON 格式，不要包含任何其他文字
-2. 所有字段都必须详细填写，不允许简略总结
-3. 保持客观、准确、专业，深入挖掘论文细节
-4. 目标是让读者无需阅读原文即可全面理解论文
+2. 保持简洁但准确，每个字段1-2句话即可
+3. 直接输出 JSON，不要包含 ```json 标记
 
 **论文内容：**
 {paper_content}
 
-**请输出以下 JSON 格式的深度分析结果（直接输出 JSON，不要包含 ```json 标记）：**
+**请输出以下 JSON 格式（保持简洁）：**
 
 {{
   "basic_info": {{
     "title": "论文完整标题",
-    "authors": "作者列表（含机构）",
+    "authors": "第一作者等（机构）",
     "journal": "期刊名称",
     "publisher": "出版社",
     "publish_date": "发表时间",
     "doi": "DOI",
-    "category": "研究领域分类",
+    "category": "研究领域",
     "keywords": ["关键词1", "关键词2", "关键词3"]
   }},
   "background_and_problem": {{
-    "research_background": "详细的研究背景描述（3-5句话）",
-    "field_pain_points": "领域痛点和挑战（具体问题）",
-    "existing_methods_limitations": "现有方法的不足之处"
+    "research_background": "研究背景（1-2句话）",
+    "field_pain_points": "领域痛点（1句话）",
+    "existing_methods_limitations": "现有方法不足（1句话）"
   }},
   "research_objectives": {{
-    "core_research_question": "核心研究问题（明确具体）",
-    "scope_description": "适用范围和边界条件说明"
+    "core_research_question": "核心研究问题（1句话）",
+    "scope_description": "适用范围（1句话）"
   }},
   "methodology": {{
-    "overall_workflow": "整体研究流程描述",
-    "experimental_design_logic": "实验设计的逻辑说明",
-    "key_techniques": ["关键技术1", "关键技术2"],
-    "characterization_methods": ["表征方法1", "表征方法2"]
+    "overall_workflow": "整体流程（1-2句话）",
+    "experimental_design_logic": "实验设计逻辑（1句话）",
+    "key_techniques": ["技术1", "技术2"],
+    "characterization_methods": ["方法1", "方法2"]
   }},
   "key_results": {{
-    "main_findings": "关键实验结果描述",
-    "data_trends": "数据趋势解读",
-    "supporting_evidence": "支撑结论的证据"
+    "main_findings": "关键发现（1-2句话）",
+    "data_trends": "数据趋势（1句话）",
+    "supporting_evidence": "支撑证据（1句话）"
   }},
   "innovation_analysis": {{
-    "method_innovation": "方法创新点",
-    "mechanism_innovation": "机理创新点",
-    "application_innovation": "工程/应用创新点",
-    "difference_from_prior_work": "与前人工作的本质差异"
+    "method_innovation": "方法创新（1句话）",
+    "mechanism_innovation": "机理创新（1句话）",
+    "application_innovation": "应用创新（1句话）",
+    "difference_from_prior_work": "与前人差异（1句话）"
   }},
   "limitations": {{
-    "author_acknowledged": "作者承认的限制",
-    "ai_inferred_risks": "AI 推断的潜在风险点"
+    "author_acknowledged": "作者承认的限制（1句话）",
+    "ai_inferred_risks": "潜在风险（1句话）"
   }},
   "experiment_replication": {{
-    "materials_preparation": "材料准备清单",
-    "process_parameters": "工艺参数（明确标注来源：论文/AI补全）",
-    "characterization_methods": "表征方法",
-    "evaluation_metrics": "评价指标",
-    "step_by_step_guide": ["步骤1", "步骤2", "步骤3"]
+    "materials_preparation": "材料清单（简要）",
+    "process_parameters": "关键参数（简要）",
+    "characterization_methods": "表征方法（简要）",
+    "evaluation_metrics": "评价指标（简要）",
+    "step_by_step_guide": ["步骤1", "步骤2", "步骤3", "步骤4"]
   }},
   "experiment_extension": {{
-    "parameter_optimization": "参数优化建议",
-    "material_system_transfer": "材料体系迁移方案",
-    "alternative_routes": "替代工艺路线"
+    "parameter_optimization": "参数优化建议（1句话）",
+    "material_system_transfer": "体系迁移方案（1句话）",
+    "alternative_routes": "替代路线（1句话）"
   }},
   "comparative_analysis": {{
-    "similar_works_comparison": "与相似文献的实验条件对比",
-    "performance_cost_comparison": "性能与成本对比",
-    "application_scenarios": "适用场景对比"
+    "similar_works_comparison": "与相似工作对比（1句话）",
+    "performance_cost_comparison": "性能成本对比（1句话）",
+    "application_scenarios": "适用场景（1句话）"
   }},
   "risks_and_warnings": {{
     "failure_prone_steps": ["易失败步骤1", "易失败步骤2"],
@@ -89,7 +89,7 @@ AI_ANALYSIS_PROMPT = """你是一个专业的科研文献深度分析助手。�
     "analysis_model": "Claude Sonnet 4.5",
     "analysis_time": "{analysis_time}",
     "confidence": "high",
-    "analysis_depth": "comprehensive"
+    "analysis_depth": "concise"
   }}
 }}
 """
@@ -138,7 +138,7 @@ def analyze_paper_with_ai(pdf_path: str) -> dict:
         # 调用 Claude API
         message = client.messages.create(
             model=CLAUDE_MODEL,
-            max_tokens=16000,
+            max_tokens=20000,  # 增加 token 限制以支持更完整的分析结果
             temperature=0.3,
             messages=[
                 {
@@ -161,6 +161,21 @@ def analyze_paper_with_ai(pdf_path: str) -> dict:
             response_text = response_text[:-3]
         response_text = response_text.strip()
 
+        # 尝试修复可能被截断的 JSON
+        if not response_text.endswith("}"):
+            # JSON 可能被截断，尝试补全
+            print(f"[AI 分析] 检测到 JSON 可能被截断，尝试修复...")
+            # 找到最后一个完整的字段
+            last_brace = response_text.rfind("}")
+            if last_brace > 0:
+                # 截取到最后一个完整的闭合括号，然后补全
+                response_text = response_text[:last_brace + 1]
+                # 补全可能缺失的闭合括号
+                open_braces = response_text.count("{")
+                close_braces = response_text.count("}")
+                if open_braces > close_braces:
+                    response_text += "}" * (open_braces - close_braces)
+
         # 解析 JSON 响应
         analysis_result = json.loads(response_text)
 
@@ -177,7 +192,9 @@ def analyze_paper_with_ai(pdf_path: str) -> dict:
 
     except json.JSONDecodeError as e:
         print(f"[AI 分析] JSON 解析失败: {str(e)}")
-        print(f"[AI 分析] 原始响应: {response_text[:500]}...")
+        print(f"[AI 分析] 响应长度: {len(response_text)} 字符")
+        print(f"[AI 分析] 响应开头: {response_text[:300]}...")
+        print(f"[AI 分析] 响应结尾: ...{response_text[-300:]}")
         # 返回降级的模拟数据
         return _get_fallback_result(analysis_time)
     except Exception as e:
@@ -367,3 +384,240 @@ def analyze_paper(db, paper_id: int, force_reanalyze: bool = False) -> dict:
         "analysis": analysis_result,
         "from_cache": False
     }
+
+
+def refresh_analysis_snapshot(db, paper_id: int) -> dict:
+    """
+    刷新分析显示快照
+
+    不重新调用 AI API，而是基于已有的分析结果重建显示快照。
+    用于更新显示格式、版本号等，而不消耗 API 额度。
+
+    Args:
+        db: 数据库会话
+        paper_id: 文献 ID
+
+    Returns:
+        刷新后的分析快照，如果文献不存在或未分析则返回 None
+    """
+    from models.paper import Paper
+
+    paper = db.query(Paper).filter(Paper.id == paper_id).first()
+    if not paper:
+        return None
+
+    # 检查是否已有分析结果
+    if not paper.ai_analyzed or not paper.ai_analysis_json:
+        return None
+
+    # 加载现有的分析数据
+    try:
+        analysis_data = json.loads(paper.ai_analysis_json)
+    except json.JSONDecodeError:
+        return None
+
+    # 生成版本哈希
+    data_str = json.dumps(analysis_data, sort_keys=True, ensure_ascii=False)
+    version_hash = hashlib.sha256(data_str.encode('utf-8')).hexdigest()[:16]
+
+    # 重建分析章节
+    analysis_sections = _build_analysis_sections(analysis_data)
+
+    # 获取 AI 元数据
+    ai_meta = analysis_data.get("ai_meta", {})
+
+    # 构建刷新后的快照
+    refreshed_snapshot = {
+        "paper_id": paper.id,
+        "title": paper.title,
+        "analysis_version": f"v1.0-{version_hash}",
+        "analysis_generated_at": datetime.utcnow().isoformat(),
+        "original_analysis_time": ai_meta.get("analysis_time", ""),
+        "analysis_model": ai_meta.get("analysis_model", "Claude Sonnet 4.5"),
+        "analysis_sections": analysis_sections,
+        "metadata": {
+            "total_sections": len(analysis_sections),
+            "has_experiment_plan": paper.has_experiment_plan,
+            "refresh_type": "snapshot_rebuild",
+            "source": "cached_analysis"
+        }
+    }
+
+    return refreshed_snapshot
+
+
+def _build_analysis_sections(analysis_data: dict) -> list:
+    """
+    将原始分析数据重构为 UI 友好的分段格式
+
+    Args:
+        analysis_data: 原始的 AI 分析 JSON 数据
+
+    Returns:
+        结构化的分析章节列表
+    """
+    sections = []
+
+    # 1. 基本信息
+    if "basic_info" in analysis_data:
+        basic_info = analysis_data["basic_info"]
+        sections.append({
+            "section_id": "basic_info",
+            "section_title": "基本信息",
+            "section_type": "metadata",
+            "content": {
+                "title": basic_info.get("title", ""),
+                "authors": basic_info.get("authors", ""),
+                "journal": basic_info.get("journal", ""),
+                "publisher": basic_info.get("publisher", ""),
+                "publish_date": basic_info.get("publish_date", ""),
+                "doi": basic_info.get("doi", ""),
+                "category": basic_info.get("category", ""),
+                "keywords": basic_info.get("keywords", [])
+            }
+        })
+
+    # 2. 研究背景与问题
+    if "background_and_problem" in analysis_data:
+        bg = analysis_data["background_and_problem"]
+        sections.append({
+            "section_id": "background",
+            "section_title": "研究背景与问题",
+            "section_type": "text_block",
+            "content": {
+                "research_background": bg.get("research_background", ""),
+                "field_pain_points": bg.get("field_pain_points", ""),
+                "existing_methods_limitations": bg.get("existing_methods_limitations", "")
+            }
+        })
+
+    # 3. 研究目标
+    if "research_objectives" in analysis_data:
+        obj = analysis_data["research_objectives"]
+        sections.append({
+            "section_id": "objectives",
+            "section_title": "研究目标",
+            "section_type": "text_block",
+            "content": {
+                "core_research_question": obj.get("core_research_question", ""),
+                "scope_description": obj.get("scope_description", "")
+            }
+        })
+
+    # 4. 研究方法
+    if "methodology" in analysis_data:
+        method = analysis_data["methodology"]
+        sections.append({
+            "section_id": "methodology",
+            "section_title": "研究方法",
+            "section_type": "structured",
+            "content": {
+                "overall_workflow": method.get("overall_workflow", ""),
+                "experimental_design_logic": method.get("experimental_design_logic", ""),
+                "key_techniques": method.get("key_techniques", []),
+                "characterization_methods": method.get("characterization_methods", [])
+            }
+        })
+
+    # 5. 关键结果
+    if "key_results" in analysis_data:
+        results = analysis_data["key_results"]
+        sections.append({
+            "section_id": "results",
+            "section_title": "关键结果",
+            "section_type": "text_block",
+            "content": {
+                "main_findings": results.get("main_findings", ""),
+                "data_trends": results.get("data_trends", ""),
+                "supporting_evidence": results.get("supporting_evidence", "")
+            }
+        })
+
+    # 6. 创新点分析
+    if "innovation_analysis" in analysis_data:
+        innovation = analysis_data["innovation_analysis"]
+        sections.append({
+            "section_id": "innovation",
+            "section_title": "创新点分析",
+            "section_type": "structured",
+            "content": {
+                "method_innovation": innovation.get("method_innovation", ""),
+                "mechanism_innovation": innovation.get("mechanism_innovation", ""),
+                "application_innovation": innovation.get("application_innovation", ""),
+                "difference_from_prior_work": innovation.get("difference_from_prior_work", "")
+            }
+        })
+
+    # 7. 局限性
+    if "limitations" in analysis_data:
+        limits = analysis_data["limitations"]
+        sections.append({
+            "section_id": "limitations",
+            "section_title": "研究局限性",
+            "section_type": "text_block",
+            "content": {
+                "author_acknowledged": limits.get("author_acknowledged", ""),
+                "ai_inferred_risks": limits.get("ai_inferred_risks", "")
+            }
+        })
+
+    # 8. 实验复现指南
+    if "experiment_replication" in analysis_data:
+        replication = analysis_data["experiment_replication"]
+        sections.append({
+            "section_id": "replication",
+            "section_title": "实验复现指南",
+            "section_type": "guide",
+            "content": {
+                "materials_preparation": replication.get("materials_preparation", ""),
+                "process_parameters": replication.get("process_parameters", ""),
+                "characterization_methods": replication.get("characterization_methods", ""),
+                "evaluation_metrics": replication.get("evaluation_metrics", ""),
+                "step_by_step_guide": replication.get("step_by_step_guide", [])
+            }
+        })
+
+    # 9. 实验扩展建议
+    if "experiment_extension" in analysis_data:
+        extension = analysis_data["experiment_extension"]
+        sections.append({
+            "section_id": "extension",
+            "section_title": "实验扩展建议",
+            "section_type": "text_block",
+            "content": {
+                "parameter_optimization": extension.get("parameter_optimization", ""),
+                "material_system_transfer": extension.get("material_system_transfer", ""),
+                "alternative_routes": extension.get("alternative_routes", "")
+            }
+        })
+
+    # 10. 对比分析
+    if "comparative_analysis" in analysis_data:
+        comparison = analysis_data["comparative_analysis"]
+        sections.append({
+            "section_id": "comparison",
+            "section_title": "对比分析",
+            "section_type": "text_block",
+            "content": {
+                "similar_works_comparison": comparison.get("similar_works_comparison", ""),
+                "performance_cost_comparison": comparison.get("performance_cost_comparison", ""),
+                "application_scenarios": comparison.get("application_scenarios", "")
+            }
+        })
+
+    # 11. 风险与注意事项
+    if "risks_and_warnings" in analysis_data:
+        risks = analysis_data["risks_and_warnings"]
+        sections.append({
+            "section_id": "risks",
+            "section_title": "风险与注意事项",
+            "section_type": "list",
+            "content": {
+                "failure_prone_steps": risks.get("failure_prone_steps", []),
+                "experimental_precautions": risks.get("experimental_precautions", []),
+                "beginner_warnings": risks.get("beginner_warnings", [])
+            }
+        })
+
+    return sections
+

@@ -10,6 +10,32 @@
 
 let selectedFiles = [];
 
+// ==================== 时间格式化函数 ====================
+function formatRelativeTime(dateString) {
+  if (!dateString) return '-';
+
+  const importDate = new Date(dateString);
+  const now = new Date();
+
+  // 计算时间差（毫秒）
+  const diffMs = now - importDate;
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return '今天';
+  } else if (diffDays === 1) {
+    return '昨天';
+  } else if (diffDays < 7) {
+    return '近七天';
+  } else {
+    // 七天前显示具体日期
+    const year = importDate.getFullYear();
+    const month = String(importDate.getMonth() + 1).padStart(2, '0');
+    const day = String(importDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+}
+
 // ==================== 统计卡片渲染 ====================
 function renderStats(stats) {
   console.log('[renderStats] 更新统计信息:', stats);
@@ -54,7 +80,7 @@ function renderPaperTable(papers) {
   if (!papers || papers.length === 0) {
     tbody.innerHTML = `
       <tr>
-        <td colspan="6" style="text-align: center; padding: 3rem; color: #666;">
+        <td colspan="8" style="text-align: center; padding: 3rem; color: #666;">
           <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
           <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">暂无文献数据</div>
           <div style="font-size: 0.9rem; color: #999;">点击右上角"导入文献"按钮开始添加 PDF</div>
@@ -74,12 +100,16 @@ function renderPaperTable(papers) {
       const title = paper.title || '未解析标题';
       const journal = paper.journal || '';
       const year = paper.year || '';
+      const category = paper.category || '未分类';
       const isRead = paper.read || false;
       const isAiAnalyzed = paper.ai_analyzed || false;
+      const importedAt = paper.imported_at || '';
 
       // 显示逻辑：AI 分析完成后必须显示解析结果，否则显示「解析中」
       const displayJournal = isAiAnalyzed ? (journal || '-') : (journal || '解析中');
       const displayYear = isAiAnalyzed ? (year || '-') : (year || '解析中');
+      const displayCategory = isAiAnalyzed ? category : '解析中';
+      const displayImportDate = formatRelativeTime(importedAt);
 
       row.innerHTML = `
         <td><input type="checkbox" class="paper-checkbox" data-paper-id="${paperId}" data-ai-analyzed="${isAiAnalyzed}"></td>
@@ -88,6 +118,8 @@ function renderPaperTable(papers) {
         </td>
         <td>${displayJournal}</td>
         <td>${displayYear}</td>
+        <td><span class="badge badge-info">${displayCategory}</span></td>
+        <td>${displayImportDate}</td>
         <td>
           <span class="badge ${isRead ? 'badge-success' : 'badge-secondary'}"
                 style="cursor: pointer;"
@@ -104,6 +136,7 @@ function renderPaperTable(papers) {
             : `<button class="btn btn-sm btn-primary" data-action="ai-analyze" data-paper-id="${paperId}">🤖 AI 辅助阅读</button>`
           }
           <button class="btn btn-sm btn-secondary" data-action="view-pdf" data-paper-id="${paperId}">查看 PDF</button>
+          <button class="btn btn-sm btn-danger" data-action="delete-paper" data-paper-id="${paperId}" style="margin-left: 0.5rem;">删除</button>
         </td>
       `;
       tbody.appendChild(row);
@@ -158,6 +191,15 @@ function bindDynamicEvents() {
     });
   });
 
+  // 删除文献
+  document.querySelectorAll('[data-action="delete-paper"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] 删除文献:', paperId);
+      deletePaper(paperId);
+    });
+  });
+
   // 文献复选框变化
   document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
     checkbox.addEventListener('change', updateBatchAnalyzeButton);
@@ -198,7 +240,7 @@ async function loadPapers() {
     if (tbody) {
       tbody.innerHTML = `
         <tr>
-          <td colspan="6" style="text-align: center; padding: 3rem; color: #e74c3c;">
+          <td colspan="8" style="text-align: center; padding: 3rem; color: #e74c3c;">
             <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
             <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">加载失败</div>
             <div style="font-size: 0.9rem; color: #999;">请检查后端服务是否启动</div>
@@ -281,8 +323,10 @@ async function toggleReadStatus(paperId) {
 
 // ==================== AI 解读文献 ====================
 async function analyzePaper(paperId) {
-  console.log('[analyzePaper] 分析文献:', paperId);
-  await openAdvancedAnalysisModal(paperId, false);
+  console.log('[analyzePaper] 添加文献到分析队列:', paperId);
+
+  // 单篇分析也使用队列系统
+  await startQueueAnalysis([paperId]);
 }
 
 // ==================== 查看已有的 AI 分析结果 ====================
@@ -297,6 +341,219 @@ function viewPDF(paperId) {
   const pdfUrl = `${API_BASE_URL}/api/papers/${paperId}/pdf`;
   window.open(pdfUrl, '_blank');
 }
+
+// ==================== 删除文献 ====================
+async function deletePaper(paperId) {
+  console.log('[deletePaper] 删除文献:', paperId);
+
+  if (!confirm('确定要删除这篇文献吗？\n\n文献将被移至回收站，可以在回收站中恢复。')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers/${paperId}`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[deletePaper] 删除成功:', data);
+
+    // 更新统计信息
+    if (data.stats) {
+      renderStats(data.stats);
+    }
+
+    // 更新文献列表
+    if (data.papers) {
+      renderPaperTable(data.papers);
+    }
+
+    alert('文献已移至回收站');
+
+  } catch (error) {
+    console.error('[deletePaper] 删除失败:', error);
+    alert('删除失败：' + error.message);
+  }
+}
+
+// ==================== 回收站功能 ====================
+async function showTrash() {
+  console.log('[showTrash] 显示回收站');
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers?show_deleted=true`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[showTrash] 接收到回收站数据:', data);
+
+    // 更新页面标题
+    const pageTitle = document.querySelector('.page-title');
+    const pageSubtitle = document.querySelector('.page-subtitle');
+    if (pageTitle) pageTitle.textContent = '回收站';
+    if (pageSubtitle) pageSubtitle.textContent = '已删除的文献可以在这里恢复或永久删除';
+
+    // 渲染回收站文献列表
+    renderTrashTable(data.papers || []);
+
+  } catch (error) {
+    console.error('[showTrash] 加载回收站失败:', error);
+    alert('加载回收站失败：' + error.message);
+  }
+}
+
+function renderTrashTable(papers) {
+  console.log('[renderTrashTable] 渲染回收站列表，数量:', papers?.length || 0);
+
+  const tbody = document.getElementById('paper-list');
+  if (!tbody) {
+    console.error('[renderTrashTable] 找不到 paper-list 元素');
+    return;
+  }
+
+  tbody.innerHTML = '';
+
+  // 情况1：回收站为空
+  if (!papers || papers.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="8" style="text-align: center; padding: 3rem; color: #666;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
+          <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">回收站是空的</div>
+          <div style="font-size: 0.9rem; color: #999;">删除的文献会暂时保存在这里</div>
+          <button class="btn btn-primary" style="margin-top: 1rem;" onclick="location.href='index.html'">返回文献库</button>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  // 情况2：有已删除的文献
+  papers.forEach((paper, index) => {
+    try {
+      const row = document.createElement('tr');
+
+      const paperId = paper.id || index;
+      const title = paper.title || '未解析标题';
+      const journal = paper.journal || '-';
+      const year = paper.year || '-';
+      const category = paper.category || '未分类';
+      const deletedAt = formatRelativeTime(paper.deleted_at);
+
+      row.innerHTML = `
+        <td></td>
+        <td>
+          <div class="paper-title">${title}</div>
+        </td>
+        <td>${journal}</td>
+        <td>${year}</td>
+        <td><span class="badge badge-info">${category}</span></td>
+        <td>${deletedAt}</td>
+        <td><span class="badge badge-danger">已删除</span></td>
+        <td>
+          <button class="btn btn-sm btn-success" data-action="restore-paper" data-paper-id="${paperId}">恢复</button>
+          <button class="btn btn-sm btn-danger" data-action="permanent-delete" data-paper-id="${paperId}" style="margin-left: 0.5rem;">永久删除</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    } catch (error) {
+      console.error(`[renderTrashTable] 渲染文献 ${paper?.id} 失败:`, error);
+    }
+  });
+
+  // 绑定回收站按钮事件
+  bindTrashEvents();
+}
+
+function bindTrashEvents() {
+  console.log('[bindTrashEvents] 绑定回收站按钮事件');
+
+  // 恢复文献
+  document.querySelectorAll('[data-action="restore-paper"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] 恢复文献:', paperId);
+      restorePaper(paperId);
+    });
+  });
+
+  // 永久删除
+  document.querySelectorAll('[data-action="permanent-delete"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] 永久删除:', paperId);
+      permanentDeletePaper(paperId);
+    });
+  });
+}
+
+async function restorePaper(paperId) {
+  console.log('[restorePaper] 恢复文献:', paperId);
+
+  if (!confirm('确定要恢复这篇文献吗？')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers/${paperId}/restore`, {
+      method: 'POST'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[restorePaper] 恢复成功:', data);
+
+    alert('文献已恢复');
+
+    // 重新加载回收站
+    showTrash();
+
+  } catch (error) {
+    console.error('[restorePaper] 恢复失败:', error);
+    alert('恢复失败：' + error.message);
+  }
+}
+
+async function permanentDeletePaper(paperId) {
+  console.log('[permanentDeletePaper] 永久删除文献:', paperId);
+
+  if (!confirm('确定要永久删除这篇文献吗？\n\n此操作无法撤销，PDF 文件也会被删除！')) {
+    return;
+  }
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers/${paperId}?permanent=true`, {
+      method: 'DELETE'
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[permanentDeletePaper] 永久删除成功:', data);
+
+    alert('文献已永久删除');
+
+    // 重新加载回收站
+    showTrash();
+
+  } catch (error) {
+    console.error('[permanentDeletePaper] 永久删除失败:', error);
+    alert('永久删除失败：' + error.message);
+  }
+}
+
 
 // ==================== 文件上传功能 ====================
 function initFileUpload() {
@@ -601,6 +858,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     selectAllCheckbox.addEventListener('change', function() {
       console.log('[Event] 全选复选框变化');
       toggleSelectAll();
+    });
+  }
+
+  // 绑定回收站链接
+  const trashLink = document.getElementById('trash-link');
+  if (trashLink) {
+    trashLink.addEventListener('click', function(e) {
+      e.preventDefault();
+      console.log('[Event] 点击回收站');
+      showTrash();
     });
   }
 

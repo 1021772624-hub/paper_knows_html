@@ -25,3 +25,9 @@ __pycache__/
 # Temporary files
 nul
 *.tmp
+
+# PDF files (research papers)
+*.pdf
+
+# Temporary scripts
+check_db.py

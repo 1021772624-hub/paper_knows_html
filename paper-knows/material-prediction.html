@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>材料预测 - Paper Knows</title>
+  <!-- CSS 引入 -->
+  <link rel="stylesheet" href="assets/css/base.css">
+  <link rel="stylesheet" href="assets/css/layout.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/modules/sidebar.css">
+  <link rel="stylesheet" href="assets/css/modules/header.css">
+  <link rel="stylesheet" href="assets/css/modules/stat-cards.css">
+  <style>
+    /* 页面特定样式 */
+
+    /* 概览卡片 */
+    .overview-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .overview-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    .overview-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .overview-card .label {
+      font-size: 0.875rem;
+      color: var(--color-gray-600);
+      margin-bottom: 0.5rem;
+    }
+
+    .overview-card .value {
+      font-size: 1rem;
+      color: var(--color-primary);
+      font-weight: 600;
+    }
+
+    /* Section */
+    .content-section {
+      background: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .content-section h2 {
+      font-size: 1.5rem;
+      color: var(--color-gray-900);
+      margin-bottom: 1.5rem;
+      padding-bottom: 0.75rem;
+      border-bottom: 2px solid var(--color-primary);
+    }
+
+    /* 流程步骤 */
+    .flow-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem;
+      position: relative;
+    }
+
+    .flow-step {
+      background: var(--bg-hover);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius-sm);
+      padding: 1.25rem;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .flow-step:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+    }
+
+    .flow-step::after {
+      content: '→';
+      position: absolute;
+      right: -1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-primary);
+      font-size: 1.25rem;
+      font-weight: bold;
+    }
+
+    .flow-step:last-child::after {
+      display: none;
+    }
+
+    .flow-step .title {
+      font-size: 0.95rem;
+      color: var(--color-gray-900);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .flow-step .desc {
+      font-size: 0.85rem;
+      color: var(--color-gray-600);
+      line-height: 1.5;
+    }
+
+    /* 能力卡片 */
+    .capability-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .capability-card {
+      background: var(--bg-white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .capability-card:hover {
+      border-color: var(--color-primary);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .capability-card .title {
+      font-size: 1.1rem;
+      color: var(--color-gray-900);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .capability-card .desc {
+      font-size: 0.9rem;
+      color: var(--color-gray-600);
+      line-height: 1.6;
+    }
+
+    /* 输出示例 */
+    .output-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .output-card {
+      background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+      border: 1px solid var(--color-info);
+      border-radius: var(--border-radius);
+      padding: 1.5rem;
+      transition: all 0.2s ease;
+    }
+
+    .output-card:hover {
+      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
+    }
+
+    .output-card .title {
+      font-size: 1.1rem;
+      color: var(--color-gray-900);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+    }
+
+    .output-card .desc {
+      font-size: 0.95rem;
+      color: var(--color-gray-700);
+      line-height: 1.6;
+    }
+
+    /* 操作按钮 */
+    .action-section {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-top: 2rem;
+      flex-wrap: wrap;
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .flow-container {
+        grid-template-columns: 1fr;
+      }
+
+      .flow-step::after {
+        content: '↓';
+        right: 50%;
+        top: auto;
+        bottom: -1.5rem;
+        transform: translateX(50%);
+      }
+
+      .capability-grid,
+      .output-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- MODULE: SIDEBAR -->
+    <aside class="sidebar">
+      <!-- Logo 区域 -->
+      <div class="sidebar-logo">
+        <div class="logo-title">材知道</div>
+        <div class="logo-subtitle">Paper Knows</div>
+      </div>
+
+      <!-- 统计信息区域 -->
+      <div class="sidebar-stats">
+        <div class="stat-item">
+          <span class="stat-label">总文献</span>
+          <span class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">已读</span>
+          <span class="stat-value">0</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">AI 精读</span>
+          <span class="stat-value">0</span>
+        </div>
+      </div>
+
+      <!-- 导航区域 -->
+      <nav class="sidebar-nav">
+        <ul class="nav-list">
+          <li class="nav-item">
+            <a href="recommend.html" class="nav-link">
+              <span>智慧推荐</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="index.html" class="nav-link">
+              <span>我的文献库</span>
+            </a>
+          </li>
+          <li class="nav-item">
+            <a href="material-prediction.html" class="nav-link active">
+              <span>材料预测</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- 设置区域 -->
+      <div class="sidebar-footer">
+        <div class="theme-toggle" id="theme-toggle">
+          <span>切换深浅色模式</span>
+          <span>🌙</span>
+        </div>
+        <div class="version-info">v1.0.0 MVP</div>
+      </div>
+    </aside>
+    <!-- END MODULE: SIDEBAR -->
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+      <!-- MODULE: PAGE_HEADER -->
+      <div class="page-header">
+        <h1 class="page-title">材料预测</h1>
+        <p class="page-subtitle">人工智能驱动的固态电池关键材料预测与研发辅助</p>
+      </div>
+      <!-- END MODULE: PAGE_HEADER -->
+
+      <!-- 概览卡片 -->
+      <div class="overview-section">
+          <div class="overview-card">
+            <div class="label">分析材料体系</div>
+            <div class="value">固态电解质 · 电极 · 界面</div>
+          </div>
+          <div class="overview-card">
+            <div class="label">预测目标</div>
+            <div class="value">性能 · 稳定性 · 可行性</div>
+          </div>
+          <div class="overview-card">
+            <div class="label">数据来源</div>
+            <div class="value">文献 + 模型 + 历史实验</div>
+          </div>
+        </div>
+
+        <!-- AI 材料预测流程 -->
+        <div class="content-section">
+          <h2>AI 材料预测流程</h2>
+          <div class="flow-container">
+            <div class="flow-step">
+              <div class="title">文献与数据输入</div>
+              <div class="desc">固态电解质、电极与界面相关文献，以及已有实验与计算数据</div>
+            </div>
+            <div class="flow-step">
+              <div class="title">特征与描述符构建</div>
+              <div class="desc">成分、晶体结构、缺陷类型、离子迁移通道、界面反应特征</div>
+            </div>
+            <div class="flow-step">
+              <div class="title">关键性能预测</div>
+              <div class="desc">离子电导率、电化学稳定窗口、界面相容性</div>
+            </div>
+            <div class="flow-step">
+              <div class="title">多目标权衡分析</div>
+              <div class="desc">性能、稳定性与工艺可行性的综合评估</div>
+            </div>
+            <div class="flow-step">
+              <div class="title">候选材料输出</div>
+              <div class="desc">给出优先级明确的候选材料与优化方向</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 预测能力 -->
+        <div class="content-section">
+          <h2>固态电池材料预测能力</h2>
+          <div class="capability-grid">
+            <div class="capability-card">
+              <div class="title">固态电解质筛选</div>
+              <div class="desc">预测不同材料体系的离子电导率上限与稳定区间</div>
+            </div>
+            <div class="capability-card">
+              <div class="title">掺杂与成分优化</div>
+              <div class="desc">评估掺杂元素对传导机制与结构稳定性的影响</div>
+            </div>
+            <div class="capability-card">
+              <div class="title">界面相容性预测</div>
+              <div class="desc">判断电解质与电极之间潜在反应与副相风险</div>
+            </div>
+            <div class="capability-card">
+              <div class="title">结构-性能归因</div>
+              <div class="desc">识别限制离子迁移的关键结构或缺陷因素</div>
+            </div>
+            <div class="capability-card">
+              <div class="title">材料体系对比</div>
+              <div class="desc">横向比较硫化物、氧化物、聚合物固态电解质</div>
+            </div>
+            <div class="capability-card">
+              <div class="title">实验路径建议</div>
+              <div class="desc">输出可落地的材料制备与性能优化思路</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 预测输出示例 -->
+        <div class="content-section">
+          <h2>AI 预测输出示例</h2>
+          <div class="output-grid">
+            <div class="output-card">
+              <div class="title">候选材料方向</div>
+              <div class="desc">
+                硫化物固态电解质中，特定元素掺杂有望在保持稳定性的同时提升室温离子电导率
+              </div>
+            </div>
+            <div class="output-card">
+              <div class="title">风险提示</div>
+              <div class="desc">
+                高电导率材料可能在高电压正极下存在界面反应风险，需配合界面工程
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 操作按钮 -->
+        <div class="action-section">
+          <button class="btn btn-primary" onclick="alert('AI 材料预测功能开发中...')">
+            🤖 启动 AI 材料预测
+          </button>
+          <button class="btn btn-secondary" onclick="window.location.href='index.html'">
+            📄 返回文献库
+          </button>
+        </div>
+    </main>
+  </div>
+
+  <!-- JavaScript 引入 -->
+  <script src="assets/js/config.js?v=1"></script>
+  <script src="assets/js/main.js?v=7"></script>
+</body>
+</html>

@@ -21,6 +21,10 @@ class Paper(Base):
     imported_at = Column(DateTime, default=datetime.utcnow)
     read_status = Column(String, default="unread")  # unread, reading, read
 
+    # 软删除相关字段
+    is_deleted = Column(Boolean, default=False)  # 是否已删除（在回收站中）
+    deleted_at = Column(DateTime, nullable=True)  # 删除时间
+
     # PDF 解析相关字段
     source_filename = Column(String, nullable=True)  # 原始文件名
     parse_method = Column(String, default="filename")  # filename / pdf / ai
@@ -59,5 +63,7 @@ class Paper(Base):
             "parse_method": self.parse_method,
             "parse_confidence": self.parse_confidence,
             "ai_analysis": ai_analysis,
-            "ai_analysis_time": self.ai_analysis_time.isoformat() if self.ai_analysis_time else None
+            "ai_analysis_time": self.ai_analysis_time.isoformat() if self.ai_analysis_time else None,
+            "is_deleted": self.is_deleted,
+            "deleted_at": self.deleted_at.isoformat() if self.deleted_at else None
         }

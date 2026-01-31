@@ -46,21 +46,26 @@ function renderAdvancedAnalysisModal(paperId, analysis, fromCache = false) {
           置信度: ${analysis.ai_meta.confidence}
         </p>
       </div>
-      <div style="display: flex; gap: 1rem; align-items: center;">
-        <button onclick="reanalyze Paper(${paperId})" class="btn btn-secondary" style="padding: 0.5rem 1rem;">
-          🔄 重新分析
-        </button>
-        <button onclick="closeAdvancedAnalysisModal()" style="background: none; border: none; font-size: 2rem; cursor: pointer; color: #95a5a6;">×</button>
-      </div>
+      <button onclick="closeAdvancedAnalysisModal()" style="background: none; border: none; font-size: 2rem; cursor: pointer; color: #95a5a6;">×</button>
     </div>
 
-    <div style="display: flex; border-bottom: 1px solid #e0e0e0; padding: 0 2rem; background: #f8f9fa;">
-      <button class="tab-btn active" data-tab="deep-analysis" onclick="switchTab('deep-analysis')" style="padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; border-bottom: 3px solid #3498db; font-weight: 600; color: #2c3e50;">
-        📚 文献深度解析
-      </button>
-      <button class="tab-btn" data-tab="experiment-plan" onclick="switchTab('experiment-plan')" style="padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; color: #7f8c8d;">
-        🔬 实验方案
-      </button>
+    <div style="display: flex; border-bottom: 1px solid #e0e0e0; padding: 0 2rem; background: #f8f9fa; align-items: center; justify-content: space-between;">
+      <div style="display: flex;">
+        <button class="tab-btn active" data-tab="deep-analysis" onclick="switchTab('deep-analysis')" style="padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; border-bottom: 3px solid #3498db; font-weight: 600; color: #2c3e50;">
+          📚 文献深度解析
+        </button>
+        <button class="tab-btn" data-tab="experiment-plan" onclick="switchTab('experiment-plan')" style="padding: 1rem 1.5rem; border: none; background: none; cursor: pointer; border-bottom: 3px solid transparent; color: #7f8c8d;">
+          🔬 实验方案
+        </button>
+      </div>
+      <div style="display: flex; gap: 0.5rem;">
+        <button onclick="viewPDF(${paperId})" class="btn btn-secondary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+          📄 查看 PDF
+        </button>
+        <button onclick="reanalyzePaper(${paperId})" class="btn btn-primary" style="padding: 0.5rem 1rem; font-size: 0.9rem;">
+          🔄 重新分析
+        </button>
+      </div>
     </div>
 
     <div style="flex: 1; overflow-y: auto; padding: 2rem;">
@@ -391,5 +396,22 @@ async function openAdvancedAnalysisModal(paperId, forceReanalyze = false) {
         <button onclick="closeAdvancedAnalysisModal()" class="btn btn-primary">关闭</button>
       </div>
     `;
+  }
+}
+
+
+// 重新分析文献
+async function reanalyzePaper(paperId) {
+  if (!confirm('确定要重新分析这篇文献吗？\n\n这将使用 AI 重新解析 PDF 内容。')) {
+    return;
+  }
+
+  closeAdvancedAnalysisModal();
+
+  // 使用队列系统进行重新分析
+  if (typeof startQueueAnalysis === 'function') {
+    await startQueueAnalysis([paperId]);
+  } else {
+    alert('分析系统未就绪，请刷新页面后重试');
   }
 }
