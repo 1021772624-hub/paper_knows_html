@@ -3,6 +3,13 @@
  * 职责：侧边栏导航高亮、主题切换、全局事件监听
  */
 
+// 防御性校验：确保 config.js 已加载
+if (typeof API_BASE_URL === 'undefined') {
+  throw new Error('❌ API_BASE_URL 未定义，config.js 未正确加载');
+}
+
+console.log('[main.js] API_BASE_URL 已加载:', API_BASE_URL);
+
 // 导航高亮逻辑
 function initNavigation() {
   const navLinks = document.querySelectorAll('.nav-link');

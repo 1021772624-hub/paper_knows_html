@@ -30,19 +30,15 @@
       <div class="sidebar-stats">
         <div class="stat-item">
           <span class="stat-label">总文献</span>
-          <span class="stat-value">6</span>
+          <span class="stat-value">0</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">已读</span>
-          <span class="stat-value">1</span>
+          <span class="stat-value">0</span>
         </div>
         <div class="stat-item">
           <span class="stat-label">AI 精读</span>
-          <span class="stat-value">6</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">实验方案</span>
-          <span class="stat-value">6</span>
+          <span class="stat-value">0</span>
         </div>
       </div>
 
@@ -92,19 +88,15 @@
       <div class="stat-cards">
         <div class="stat-card">
           <div class="stat-card-label">总文献</div>
-          <div class="stat-card-value">6</div>
+          <div class="stat-card-value">0</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">已读</div>
-          <div class="stat-card-value">1</div>
+          <div class="stat-card-value">0</div>
         </div>
         <div class="stat-card">
           <div class="stat-card-label">AI 精读</div>
-          <div class="stat-card-value">6</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-card-label">实验方案</div>
-          <div class="stat-card-value">6</div>
+          <div class="stat-card-value">0</div>
         </div>
       </div>
       <!-- END MODULE: STAT_CARDS -->
@@ -133,6 +125,14 @@
             <option value="unread">未读</option>
           </select>
         </div>
+        <div class="filter-item" style="margin-left: auto;">
+          <button class="btn btn-secondary" id="batch-analyze-btn" disabled>
+            🤖 批量 AI 分析
+          </button>
+          <button class="btn btn-primary" id="import-pdf-btn">
+            📤 导入文献
+          </button>
+        </div>
       </div>
       <!-- END MODULE: FILTER_BAR -->
 
@@ -141,46 +141,16 @@
         <table class="content-table">
           <thead>
             <tr>
+              <th><input type="checkbox" id="select-all-checkbox"></th>
               <th>标题</th>
-              <th>作者</th>
+              <th>期刊</th>
               <th>年份</th>
-              <th>导入时间</th>
-              <th>分类</th>
               <th>状态</th>
               <th>操作</th>
             </tr>
           </thead>
           <tbody id="paper-list">
-            <tr>
-              <td>
-                <div class="paper-title">Effect of Heat Treatment on Microstructure and Mechanical Properties</div>
-              </td>
-              <td>Takashi Nozawa 等</td>
-              <td>2004</td>
-              <td>2026-01-29</td>
-              <td><span class="badge badge-info">材料科学</span></td>
-              <td><span class="badge badge-success">已读</span></td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn btn-sm btn-primary">详情</button>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td>
-                <div class="paper-title">A NEW APPROACH TO DETERMINE THE POISSON'S RATIO OF WOOD</div>
-              </td>
-              <td>Klara Winter 等</td>
-              <td>2026</td>
-              <td>2026-01-29</td>
-              <td><span class="badge badge-info">材料科学</span></td>
-              <td><span class="badge badge-warning">未读</span></td>
-              <td>
-                <div class="action-buttons">
-                  <button class="btn btn-sm btn-primary">详情</button>
-                </div>
-              </td>
-            </tr>
+            <!-- 文献列表将通过 JavaScript 动态加载 -->
           </tbody>
         </table>
       </div>
@@ -190,9 +160,38 @@
 
   </div>
 
+  <!-- 上传文献弹窗 -->
+  <div id="upload-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background: white; border-radius: 8px; padding: 2rem; width: 90%; max-width: 500px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+      <h2 style="margin-top: 0;">📄 导入 PDF 文献</h2>
+
+      <div id="drop-zone" style="border: 2px dashed #ccc; border-radius: 8px; padding: 3rem 2rem; text-align: center; margin: 1.5rem 0; cursor: pointer; transition: all 0.3s;">
+        <p style="margin: 0; font-size: 1.1rem; color: #666;">
+          📁 点击选择文件或拖拽 PDF 到此处
+        </p>
+        <p style="margin: 0.5rem 0 0 0; font-size: 0.9rem; color: #999;">
+          支持 .pdf 格式
+        </p>
+        <input type="file" id="pdf-file-input" accept="application/pdf" multiple style="display: none;">
+      </div>
+
+      <div id="file-info" style="display: none; padding: 1rem; background: #f8f9fa; border-radius: 4px; margin-bottom: 1rem;">
+        <p style="margin: 0; color: #333;">
+          <strong>已选择：</strong><span id="file-name"></span>
+        </p>
+      </div>
+
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
+        <button class="btn btn-secondary" id="cancel-upload-btn">取消</button>
+        <button class="btn btn-primary" id="confirm-upload-btn" disabled>确认导入</button>
+      </div>
+    </div>
+  </div>
+
   <!-- JavaScript 引入 -->
-  <script src="assets/js/mock-data.js"></script>
-  <script src="assets/js/main.js"></script>
-  <script src="assets/js/pages/index.js"></script>
+  <script src="assets/js/config.js?v=1"></script>
+  <script src="assets/js/main.js?v=7"></script>
+  <script src="assets/js/advanced-analysis-modal.js?v=2"></script>
+  <script src="assets/js/pages/index.js?v=14"></script>
 </body>
 </html>

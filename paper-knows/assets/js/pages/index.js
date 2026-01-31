@@ -1,36 +1,626 @@
 /**
  * INDEX.JS - 我的文献库页面逻辑
- * 职责：文献列表渲染、筛选、排序
+ * 职责：文献列表渲染、筛选、排序、PDF 导入、AI 解读
+ *
+ * 修复要点：
+ * 1. 移除所有 inline onclick，使用 addEventListener
+ * 2. 防御性渲染，任何字段缺失不影响整体
+ * 3. 确保列表永不空白
  */
 
-// 渲染文献列表（占位实现）
-function renderPaperList() {
-  const tbody = document.getElementById('paper-list');
-  if (!tbody) return;
+let selectedFiles = [];
 
-  // 使用 mock 数据渲染
-  if (typeof mockPapers !== 'undefined') {
-    // 后续可在此处实现动态渲染逻辑
-    console.log('文献数据已加载:', mockPapers.length, '篇');
+// ==================== 统计卡片渲染 ====================
+function renderStats(stats) {
+  console.log('[renderStats] 更新统计信息:', stats);
+
+  // 防御性处理
+  const safeStats = {
+    total: stats?.total || 0,
+    read: stats?.read || 0,
+    ai_analyzed: stats?.ai_analyzed || 0
+  };
+
+  // 更新主内容区统计卡片
+  const statCards = document.querySelectorAll('.stat-card-value');
+  if (statCards.length >= 3) {
+    statCards[0].textContent = safeStats.total;
+    statCards[1].textContent = safeStats.read;
+    statCards[2].textContent = safeStats.ai_analyzed;
+  }
+
+  // 更新侧边栏统计信息
+  const sidebarStats = document.querySelectorAll('.sidebar-stats .stat-value');
+  if (sidebarStats.length >= 3) {
+    sidebarStats[0].textContent = safeStats.total;
+    sidebarStats[1].textContent = safeStats.read;
+    sidebarStats[2].textContent = safeStats.ai_analyzed;
   }
 }
 
-// 筛选逻辑（占位）
-function initFilters() {
-  const filterSelects = document.querySelectorAll('.filter-select');
+// ==================== 文献表格渲染（防御性） ====================
+function renderPaperTable(papers) {
+  console.log('[renderPaperTable] 渲染文献列表，数量:', papers?.length || 0);
 
-  filterSelects.forEach(select => {
-    select.addEventListener('change', function() {
-      console.log('筛选条件变更:', this.id, this.value);
-      // 后续实现筛选逻辑
+  const tbody = document.getElementById('paper-list');
+  if (!tbody) {
+    console.error('[renderPaperTable] 找不到 paper-list 元素');
+    return;
+  }
+
+  tbody.innerHTML = '';
+
+  // 情况1：没有文献数据
+  if (!papers || papers.length === 0) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="6" style="text-align: center; padding: 3rem; color: #666;">
+          <div style="font-size: 3rem; margin-bottom: 1rem;">📚</div>
+          <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">暂无文献数据</div>
+          <div style="font-size: 0.9rem; color: #999;">点击右上角"导入文献"按钮开始添加 PDF</div>
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  // 情况2：有文献数据，逐条渲染
+  papers.forEach((paper, index) => {
+    try {
+      const row = document.createElement('tr');
+
+      // 防御性提取字段
+      const paperId = paper.id || index;
+      const title = paper.title || '未解析标题';
+      const journal = paper.journal || '';
+      const year = paper.year || '';
+      const isRead = paper.read || false;
+      const isAiAnalyzed = paper.ai_analyzed || false;
+
+      // 显示逻辑：AI 分析完成后必须显示解析结果，否则显示「解析中」
+      const displayJournal = isAiAnalyzed ? (journal || '-') : (journal || '解析中');
+      const displayYear = isAiAnalyzed ? (year || '-') : (year || '解析中');
+
+      row.innerHTML = `
+        <td><input type="checkbox" class="paper-checkbox" data-paper-id="${paperId}" data-ai-analyzed="${isAiAnalyzed}"></td>
+        <td>
+          <div class="paper-title">${title}</div>
+        </td>
+        <td>${displayJournal}</td>
+        <td>${displayYear}</td>
+        <td>
+          <span class="badge ${isRead ? 'badge-success' : 'badge-secondary'}"
+                style="cursor: pointer;"
+                data-action="toggle-read"
+                data-paper-id="${paperId}"
+                title="点击切换已读/未读状态">
+            ${isRead ? '已读' : '未读'}
+          </span>
+        </td>
+        <td>
+          ${isAiAnalyzed
+            ? `<span class="badge badge-success" style="margin-right: 0.5rem;">✅ 已分析</span>
+               <button class="btn btn-sm btn-primary" data-action="view-analysis" data-paper-id="${paperId}">查看分析</button>`
+            : `<button class="btn btn-sm btn-primary" data-action="ai-analyze" data-paper-id="${paperId}">🤖 AI 辅助阅读</button>`
+          }
+          <button class="btn btn-sm btn-secondary" data-action="view-pdf" data-paper-id="${paperId}">查看 PDF</button>
+        </td>
+      `;
+      tbody.appendChild(row);
+    } catch (error) {
+      console.error(`[renderPaperTable] 渲染文献 ${paper?.id} 失败:`, error);
+      // 跳过该条，继续渲染其他
+    }
+  });
+
+  // 渲染完成后，绑定动态按钮事件
+  bindDynamicEvents();
+  updateBatchAnalyzeButton();
+}
+
+// ==================== 绑定动态生成的按钮事件 ====================
+function bindDynamicEvents() {
+  console.log('[bindDynamicEvents] 绑定动态按钮事件');
+
+  // 切换已读状态
+  document.querySelectorAll('[data-action="toggle-read"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] 切换已读状态:', paperId);
+      toggleReadStatus(paperId);
     });
+  });
+
+  // AI 分析
+  document.querySelectorAll('[data-action="ai-analyze"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] AI 分析:', paperId);
+      analyzePaper(paperId);
+    });
+  });
+
+  // 查看分析
+  document.querySelectorAll('[data-action="view-analysis"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] 查看分析:', paperId);
+      viewAnalysis(paperId);
+    });
+  });
+
+  // 查看 PDF
+  document.querySelectorAll('[data-action="view-pdf"]').forEach(btn => {
+    btn.addEventListener('click', function() {
+      const paperId = this.dataset.paperId;
+      console.log('[Event] 查看 PDF:', paperId);
+      viewPDF(paperId);
+    });
+  });
+
+  // 文献复选框变化
+  document.querySelectorAll('.paper-checkbox').forEach(checkbox => {
+    checkbox.addEventListener('change', updateBatchAnalyzeButton);
   });
 }
 
-// 页面初始化
-document.addEventListener('DOMContentLoaded', function() {
-  renderPaperList();
-  initFilters();
+// ==================== 从 API 加载文献 ====================
+async function loadPapers() {
+  console.log('[loadPapers] 开始加载文献列表');
 
-  console.log('文献库页面已初始化');
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers`);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[loadPapers] 接收到数据:', data);
+
+    if (data.stats) {
+      renderStats(data.stats);
+    }
+
+    if (data.papers) {
+      renderPaperTable(data.papers);
+      console.log('[loadPapers] 文献列表已加载:', data.papers.length, '篇');
+    } else {
+      // 即使没有 papers 字段，也要渲染空状态
+      renderPaperTable([]);
+    }
+
+  } catch (error) {
+    console.error('[loadPapers] 加载文献列表失败:', error);
+
+    // 显示错误提示
+    const tbody = document.getElementById('paper-list');
+    if (tbody) {
+      tbody.innerHTML = `
+        <tr>
+          <td colspan="6" style="text-align: center; padding: 3rem; color: #e74c3c;">
+            <div style="font-size: 3rem; margin-bottom: 1rem;">⚠️</div>
+            <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">加载失败</div>
+            <div style="font-size: 0.9rem; color: #999;">请检查后端服务是否启动</div>
+            <button class="btn btn-primary" style="margin-top: 1rem;" onclick="location.reload()">重新加载</button>
+          </td>
+        </tr>
+      `;
+    }
+  }
+}
+
+// ==================== 同步文献（清除幽灵文献） ====================
+async function syncPapers() {
+  console.log('[syncPapers] 开始同步文献');
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers/sync`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log('[syncPapers] 同步完成:', data);
+
+    // 使用同步后的数据更新界面
+    if (data.stats) {
+      renderStats(data.stats);
+    }
+
+    if (data.papers) {
+      renderPaperTable(data.papers);
+      console.log('[syncPapers] 文献列表已同步:', data.papers.length, '篇');
+    }
+
+    return data;
+
+  } catch (error) {
+    console.error('[syncPapers] 同步文献失败:', error);
+    throw error;
+  }
+}
+
+// ==================== 切换已读/未读状态 ====================
+async function toggleReadStatus(paperId) {
+  console.log('[toggleReadStatus] 切换文献', paperId, '的已读状态');
+
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/papers/${paperId}/read`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+
+    // 更新统计信息
+    if (data.stats) {
+      renderStats(data.stats);
+    }
+
+    // 重新加载文献列表以更新显示
+    await loadPapers();
+
+  } catch (error) {
+    console.error('[toggleReadStatus] 切换已读状态失败:', error);
+    alert('操作失败，请重试');
+  }
+}
+
+// ==================== AI 解读文献 ====================
+async function analyzePaper(paperId) {
+  console.log('[analyzePaper] 分析文献:', paperId);
+  await openAdvancedAnalysisModal(paperId, false);
+}
+
+// ==================== 查看已有的 AI 分析结果 ====================
+async function viewAnalysis(paperId) {
+  console.log('[viewAnalysis] 查看分析:', paperId);
+  await openAdvancedAnalysisModal(paperId, false);
+}
+
+// ==================== 查看 PDF ====================
+function viewPDF(paperId) {
+  console.log('[viewPDF] 打开 PDF:', paperId);
+  const pdfUrl = `${API_BASE_URL}/api/papers/${paperId}/pdf`;
+  window.open(pdfUrl, '_blank');
+}
+
+// ==================== 文件上传功能 ====================
+function initFileUpload() {
+  console.log('[initFileUpload] 初始化文件上传功能');
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('pdf-file-input');
+  const fileInfo = document.getElementById('file-info');
+  const fileName = document.getElementById('file-name');
+  const confirmBtn = document.getElementById('confirm-upload-btn');
+
+  if (!dropZone || !fileInput) {
+    console.error('[initFileUpload] 找不到必要的 DOM 元素');
+    return;
+  }
+
+  dropZone.onclick = function() {
+    console.log('[Event] 点击上传区域');
+    fileInput.click();
+  };
+
+  fileInput.onchange = function(e) {
+    console.log('[Event] 文件选择变化');
+    const files = Array.from(e.target.files);
+    if (files.length > 0 && files.every(f => f.type === 'application/pdf')) {
+      selectedFiles = files;
+      fileName.textContent = files.length === 1 ? files[0].name : `已选择 ${files.length} 个文件`;
+      fileInfo.style.display = 'block';
+      confirmBtn.disabled = false;
+    } else {
+      alert('请选择 PDF 文件');
+    }
+  };
+
+  dropZone.ondragover = function(e) {
+    e.preventDefault();
+    dropZone.style.borderColor = '#3498db';
+    dropZone.style.background = '#f0f8ff';
+  };
+
+  dropZone.ondragleave = function() {
+    dropZone.style.borderColor = '#ccc';
+    dropZone.style.background = 'transparent';
+  };
+
+  dropZone.ondrop = function(e) {
+    e.preventDefault();
+    console.log('[Event] 文件拖放');
+    dropZone.style.borderColor = '#ccc';
+    dropZone.style.background = 'transparent';
+    const files = Array.from(e.dataTransfer.files);
+    if (files.length > 0 && files.every(f => f.type === 'application/pdf')) {
+      selectedFiles = files;
+      fileName.textContent = files.length === 1 ? files[0].name : `已选择 ${files.length} 个文件`;
+      fileInfo.style.display = 'block';
+      confirmBtn.disabled = false;
+    } else {
+      alert('请拖拽 PDF 文件');
+    }
+  };
+}
+
+// ==================== 打开上传弹窗 ====================
+function openUploadModal() {
+  console.log('[openUploadModal] 打开上传弹窗');
+
+  const modal = document.getElementById('upload-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    selectedFiles = [];
+    const fileInfo = document.getElementById('file-info');
+    const confirmBtn = document.getElementById('confirm-upload-btn');
+    if (fileInfo) fileInfo.style.display = 'none';
+    if (confirmBtn) confirmBtn.disabled = true;
+  }
+}
+
+// ==================== 关闭上传弹窗 ====================
+function closeUploadModal() {
+  console.log('[closeUploadModal] 关闭上传弹窗');
+
+  const modal = document.getElementById('upload-modal');
+  if (modal) modal.style.display = 'none';
+  selectedFiles = [];
+}
+
+// ==================== 确认上传 ====================
+async function confirmUpload() {
+  console.log('[confirmUpload] 确认上传，文件数:', selectedFiles.length);
+
+  if (!selectedFiles || selectedFiles.length === 0) {
+    alert('请先选择文件');
+    return;
+  }
+
+  const btn = document.getElementById('confirm-upload-btn');
+  btn.disabled = true;
+  btn.textContent = `上传中 (0/${selectedFiles.length})...`;
+
+  let successCount = 0;
+  let failCount = 0;
+  const errors = [];
+
+  for (let i = 0; i < selectedFiles.length; i++) {
+    const file = selectedFiles[i];
+    btn.textContent = `上传中 (${i + 1}/${selectedFiles.length})...`;
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const response = await fetch(API_BASE_URL + '/api/papers/upload', {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || '上传失败');
+      }
+
+      await response.json();
+      successCount++;
+    } catch (error) {
+      console.error(`[confirmUpload] 上传 ${file.name} 失败:`, error);
+      failCount++;
+      errors.push(`${file.name}: ${error.message}`);
+    }
+  }
+
+  // 显示结果
+  let message = `上传完成！\n✓ 成功：${successCount} 个文件`;
+  if (failCount > 0) {
+    message += `\n✗ 失败：${failCount} 个文件`;
+    if (errors.length > 0) {
+      message += `\n\n失败详情：\n${errors.join('\n')}`;
+    }
+  }
+  alert(message);
+
+  closeUploadModal();
+
+  // 上传完成后重新加载文献列表
+  await loadPapers();
+
+  btn.disabled = false;
+  btn.textContent = '确认导入';
+}
+
+// ==================== 全选/取消全选 ====================
+function toggleSelectAll() {
+  console.log('[toggleSelectAll] 切换全选状态');
+
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  const paperCheckboxes = document.querySelectorAll('.paper-checkbox');
+
+  paperCheckboxes.forEach(checkbox => {
+    checkbox.checked = selectAllCheckbox.checked;
+  });
+
+  updateBatchAnalyzeButton();
+}
+
+// ==================== 更新批量分析按钮状态 ====================
+function updateBatchAnalyzeButton() {
+  const paperCheckboxes = document.querySelectorAll('.paper-checkbox:checked');
+  const batchAnalyzeBtn = document.getElementById('batch-analyze-btn');
+
+  if (!batchAnalyzeBtn) return;
+
+  // 筛选出未分析的论文
+  const unanalyzedPapers = Array.from(paperCheckboxes).filter(
+    checkbox => checkbox.dataset.aiAnalyzed === 'false'
+  );
+
+  if (unanalyzedPapers.length > 0) {
+    batchAnalyzeBtn.disabled = false;
+    batchAnalyzeBtn.textContent = `🤖 批量 AI 分析 (${unanalyzedPapers.length})`;
+  } else {
+    batchAnalyzeBtn.disabled = true;
+    batchAnalyzeBtn.textContent = '🤖 批量 AI 分析';
+  }
+}
+
+// ==================== 批量分析文献 ====================
+async function batchAnalyzePapers() {
+  console.log('[batchAnalyzePapers] 开始批量分析');
+
+  const paperCheckboxes = document.querySelectorAll('.paper-checkbox:checked');
+
+  // 筛选出未分析的论文
+  const unanalyzedPapers = Array.from(paperCheckboxes).filter(
+    checkbox => checkbox.dataset.aiAnalyzed === 'false'
+  );
+
+  if (unanalyzedPapers.length === 0) {
+    alert('请选择未分析的文献');
+    return;
+  }
+
+  const paperIds = unanalyzedPapers.map(checkbox => parseInt(checkbox.dataset.paperId));
+
+  if (!confirm(`确定要分析 ${paperIds.length} 篇文献吗？\n\n这可能需要一些时间。`)) {
+    return;
+  }
+
+  const batchAnalyzeBtn = document.getElementById('batch-analyze-btn');
+  batchAnalyzeBtn.disabled = true;
+  batchAnalyzeBtn.textContent = `⏳ 分析中 (0/${paperIds.length})...`;
+
+  let successCount = 0;
+  let failCount = 0;
+  const errors = [];
+
+  for (let i = 0; i < paperIds.length; i++) {
+    const paperId = paperIds[i];
+    batchAnalyzeBtn.textContent = `⏳ 分析中 (${i + 1}/${paperIds.length})...`;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/papers/${paperId}/analyze`, {
+        method: 'POST'
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.detail || '分析失败');
+      }
+
+      await response.json();
+      successCount++;
+    } catch (error) {
+      console.error(`[batchAnalyzePapers] 分析文献 ${paperId} 失败:`, error);
+      failCount++;
+      errors.push(`文献 ID ${paperId}: ${error.message}`);
+    }
+  }
+
+  // 显示结果
+  let message = `批量分析完成！\n✓ 成功：${successCount} 篇`;
+  if (failCount > 0) {
+    message += `\n✗ 失败：${failCount} 篇`;
+    if (errors.length > 0) {
+      message += `\n\n失败详情：\n${errors.join('\n')}`;
+    }
+  }
+  alert(message);
+
+  // 重新加载文献列表
+  await loadPapers();
+
+  // 取消所有选中
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  if (selectAllCheckbox) selectAllCheckbox.checked = false;
+
+  batchAnalyzeBtn.disabled = true;
+  batchAnalyzeBtn.textContent = '🤖 批量 AI 分析';
+}
+
+// ==================== 页面初始化 ====================
+document.addEventListener('DOMContentLoaded', async function() {
+  console.log('='.repeat(50));
+  console.log('[DOMContentLoaded] 文献库页面开始初始化');
+  console.log('='.repeat(50));
+
+  // 初始化文件上传功能
+  initFileUpload();
+
+  // 绑定静态按钮事件
+  const importBtn = document.getElementById('import-pdf-btn');
+  if (importBtn) {
+    importBtn.addEventListener('click', function() {
+      console.log('[Event] 点击导入文献按钮');
+      openUploadModal();
+    });
+  }
+
+  const cancelBtn = document.getElementById('cancel-upload-btn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() {
+      console.log('[Event] 点击取消按钮');
+      closeUploadModal();
+    });
+  }
+
+  const confirmBtn = document.getElementById('confirm-upload-btn');
+  if (confirmBtn) {
+    confirmBtn.addEventListener('click', function() {
+      console.log('[Event] 点击确认上传按钮');
+      confirmUpload();
+    });
+  }
+
+  const batchAnalyzeBtn = document.getElementById('batch-analyze-btn');
+  if (batchAnalyzeBtn) {
+    batchAnalyzeBtn.addEventListener('click', function() {
+      console.log('[Event] 点击批量分析按钮');
+      batchAnalyzePapers();
+    });
+  }
+
+  const selectAllCheckbox = document.getElementById('select-all-checkbox');
+  if (selectAllCheckbox) {
+    selectAllCheckbox.addEventListener('change', function() {
+      console.log('[Event] 全选复选框变化');
+      toggleSelectAll();
+    });
+  }
+
+  // 绑定模态框背景点击关闭
+  const uploadModal = document.getElementById('upload-modal');
+  if (uploadModal) {
+    uploadModal.addEventListener('click', function(e) {
+      if (e.target === this) {
+        console.log('[Event] 点击模态框背景');
+        closeUploadModal();
+      }
+    });
+  }
+
+  // 加载文献列表
+  try {
+    await loadPapers();
+  } catch (error) {
+    console.error('[DOMContentLoaded] 初始加载失败:', error);
+  }
+
+  console.log('[DOMContentLoaded] 文献库页面初始化完成');
 });

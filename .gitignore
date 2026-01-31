@@ -3,3 +3,25 @@ dist/
 .env
 .DS_Store
 *.log
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# Database
+*.db
+*.sqlite
+*.sqlite3
+
+# IDE
+.vscode/
+.idea/
+.claude/
+
+# Temporary files
+nul
+*.tmp
