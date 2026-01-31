@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>我的文献库 - 材知道 Paper Knows</title>
 
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- CSS 引入 -->
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/layout.css">
@@ -20,69 +23,149 @@
   <div class="app-container">
 
     <!-- MODULE: SIDEBAR -->
-    <aside class="sidebar">
-      <!-- Logo 区域 -->
-      <div class="sidebar-logo" id="sidebar-toggle">
-        <span class="logo-icon">📚</span>
-        <div class="logo-text">
-          <div class="logo-title">材知道</div>
-          <div class="logo-subtitle">Paper Knows</div>
+    <aside class="fixed left-0 top-0 w-64 bg-white border-r border-gray-200 flex flex-col h-screen shadow-sm z-50">
+
+      <!-- SECTION 1: Logo品牌强化（宣传用） -->
+      <div class="p-6 border-b border-gray-100 shrink-0">
+        <div class="flex items-center gap-3 mb-2">
+          <!-- 新增：品牌图标，保持原配色蓝白体系 -->
+          <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-blue-500/20">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+            </svg>
+          </div>
+          <div>
+            <!-- 修改：字号加大至22px，字重加黑，保持原有文字内容"材知道" -->
+            <h1 class="text-[22px] font-black text-gray-900 tracking-tight leading-none">材知道</h1>
+            <p class="text-[10px] text-gray-500 font-medium tracking-widest mt-0.5">PAPER KNOWS</p>
+          </div>
+        </div>
+        <!-- 新增：宣传语标签，纯UI装饰 -->
+        <div class="text-[11px] text-blue-600/90 font-medium bg-blue-50/80 px-2.5 py-1.5 rounded-lg border border-blue-100/50 inline-flex items-center gap-1.5">
+          <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+          </svg>
+          材料科学研究推送平台
         </div>
       </div>
 
-      <!-- 统计信息区域 -->
-      <div class="sidebar-stats">
-        <div class="stat-item">
-          <span class="stat-label">总文献</span>
-          <span class="stat-value">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">已读</span>
-          <span class="stat-value">0</span>
-        </div>
-        <div class="stat-item">
-          <span class="stat-label">AI 精读</span>
-          <span class="stat-value">0</span>
-        </div>
-      </div>
+      <!-- SECTION 2: 导航分组（逻辑优化） -->
+      <nav class="flex-1 overflow-y-auto py-4 px-3 min-h-0">
 
-      <!-- 导航区域 -->
-      <nav class="sidebar-nav">
-        <ul class="nav-list">
-          <li class="nav-item">
-            <a href="material-prediction.html" class="nav-link">
-              <span class="nav-icon">🔬</span>
-              <span class="nav-text">材料预测</span>
+        <!-- 分组1：研究工具（原"材料预测"+"智慧推荐"） -->
+        <div class="mb-5">
+          <div class="px-3 mb-2 flex items-center gap-2 select-none">
+            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+            <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">研究工具</span>
+          </div>
+          <div class="space-y-1">
+            <!-- 保持：href="/material-prediction" 或原to属性 -->
+            <a href="material-prediction.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all group">
+              <svg class="w-5 h-5 text-center group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.384-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/>
+              </svg>
+              <span class="font-medium text-sm">材料预测</span>
             </a>
-          </li>
-          <li class="nav-item">
-            <a href="recommend.html" class="nav-link">
-              <span class="nav-icon">✨</span>
-              <span class="nav-text">智慧推荐</span>
+
+            <!-- 保持：active-class或原选中逻辑不变 -->
+            <a href="recommend.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all group">
+              <svg class="w-5 h-5 text-center group-hover:text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+              </svg>
+              <span class="font-medium text-sm">智慧推荐</span>
             </a>
-          </li>
-          <li class="nav-item">
-            <a href="index.html" class="nav-link active">
-              <span class="nav-icon">📚</span>
-              <span class="nav-text">我的文献库</span>
+          </div>
+        </div>
+
+        <!-- 分组2：文献管理（原"我的文献库"+"回收站"） -->
+        <div class="mb-2">
+          <div class="px-3 mb-2 flex items-center gap-2 select-none">
+            <svg class="w-3 h-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+            </svg>
+            <span class="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">文献管理</span>
+          </div>
+          <div class="space-y-1">
+            <a href="index.html" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all group bg-blue-50 border border-blue-100">
+              <svg class="w-5 h-5 text-center text-blue-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+              </svg>
+              <span class="font-medium text-sm text-blue-700">我的文献库</span>
             </a>
-          </li>
-          <li class="nav-item">
-            <a href="index.html?view=trash" class="nav-link" id="trash-link">
-              <span class="nav-icon">🗑️</span>
-              <span class="nav-text">回收站</span>
+
+            <a href="index.html?view=trash" class="flex items-center gap-3 px-4 py-3 text-gray-600 hover:bg-gray-50 rounded-xl transition-all group" id="trash-link">
+              <svg class="w-5 h-5 text-center group-hover:text-red-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+              <span class="font-medium text-sm">回收站</span>
             </a>
-          </li>
-        </ul>
+          </div>
+        </div>
+
+        <!-- SECTION 3: 数据概览（位置调整+视觉弱化） -->
+        <!-- 移动：从顶部移至回收站下方 -->
+        <div class="mt-4 px-2">
+          <div class="bg-gray-50/80 rounded-xl border border-gray-100 p-3">
+            <div class="flex items-center gap-2 mb-2 text-gray-400 border-b border-gray-200/60 pb-1.5">
+              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+              <span class="text-[10px] font-bold uppercase tracking-wider">数据概览</span>
+            </div>
+            <!-- 保持：数据绑定原有变量 -->
+            <div class="space-y-1.5">
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500">总文献</span>
+                <span class="font-semibold text-gray-700 tabular-nums stat-value">0</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500">已读</span>
+                <span class="font-semibold text-gray-700 tabular-nums stat-value">0</span>
+              </div>
+              <div class="flex justify-between items-center text-xs">
+                <span class="text-gray-500">AI精读</span>
+                <span class="font-semibold text-blue-600 tabular-nums stat-value">0</span>
+              </div>
+            </div>
+          </div>
+        </div>
       </nav>
 
-      <!-- 设置区域 -->
-      <div class="sidebar-footer">
-        <div class="theme-toggle" id="theme-toggle">
-          <span class="toggle-text">切换深浅色模���</span>
-          <span>🌙</span>
-        </div>
-        <div class="version-info">v1.0.0 MVP</div>
+      <!-- SECTION 4: 底部新增区域（登录+主题切换） -->
+      <div class="p-3 border-t border-gray-100 bg-gray-50/50 shrink-0 space-y-3">
+
+        <!-- 新增：用户登录入口 -->
+        <a href="#" class="group bg-white rounded-xl border border-gray-200 p-2.5 flex items-center gap-3 hover:border-blue-300 hover:shadow-sm transition-all active:scale-[0.98]">
+          <div class="w-9 h-9 rounded-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 group-hover:from-blue-50 group-hover:to-blue-100 group-hover:text-blue-600 transition-all">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-semibold text-gray-700 group-hover:text-blue-700 transition-colors">请登录</p>
+            <p class="text-[10px] text-gray-400 truncate">同步您的研究数据</p>
+          </div>
+          <svg class="w-4 h-4 text-gray-300 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+          </svg>
+        </a>
+
+        <!-- 主题切换（保持原toggleTheme函数绑定） -->
+        <button id="theme-toggle" class="w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-gray-600 hover:bg-white hover:shadow-sm rounded-lg transition-all border border-transparent hover:border-gray-200 group">
+          <div class="flex items-center gap-2">
+            <svg class="w-3.5 h-3.5 text-gray-400 group-hover:text-indigo-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+            </svg>
+            <span>深色模式</span>
+          </div>
+          <div class="w-9 h-5 rounded-full relative transition-colors bg-gray-200">
+            <div class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow-sm border border-gray-100 transition-transform translate-x-0.5"></div>
+          </div>
+        </button>
+
+        <div class="text-center text-[10px] text-gray-300">v1.0.0 MVP</div>
       </div>
     </aside>
     <!-- END MODULE: SIDEBAR -->
@@ -98,7 +181,7 @@
     </script>
 
     <!-- 主内容区 -->
-    <main class="main-content">
+    <main class="main-content" style="margin-left: 256px;">
 
       <!-- MODULE: PAGE_HEADER -->
       <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.05);">

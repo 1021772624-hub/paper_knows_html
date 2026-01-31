@@ -12,35 +12,40 @@ console.log('[main.js] API_BASE_URL 已加载:', API_BASE_URL);
 
 // 导航高亮逻辑
 function initNavigation() {
-  const navLinks = document.querySelectorAll('.nav-link');
-
   // 根据当前 URL 设置初始 active 状态
   setActiveNavByUrl();
+
+  // 获取所有导航链接
+  const navLinks = document.querySelectorAll('aside nav a[href]');
 
   navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
       // 移除所有 active 状态
-      navLinks.forEach(l => l.classList.remove('active'));
+      navLinks.forEach(l => removeActiveStyles(l));
       // 添加当前 active 状态
-      this.classList.add('active');
+      addActiveStyles(this);
     });
   });
 }
 
 // 根据当前 URL 设置导航高亮
 function setActiveNavByUrl() {
-  const navLinks = document.querySelectorAll('.nav-link');
   const currentPath = window.location.pathname;
   const currentSearch = window.location.search;
 
-  // 移除所有 active 状态
-  navLinks.forEach(l => l.classList.remove('active'));
+  // 获取所有导航链接（使用新的选择器）
+  const navLinks = document.querySelectorAll('aside nav a[href]');
+
+  // 移除所有链接的激活样式
+  navLinks.forEach(link => {
+    removeActiveStyles(link);
+  });
 
   // 检查是否是回收站页面
   if (currentSearch.includes('view=trash')) {
     const trashLink = document.getElementById('trash-link');
     if (trashLink) {
-      trashLink.classList.add('active');
+      addActiveStyles(trashLink);
       return;
     }
   }
@@ -60,9 +65,46 @@ function setActiveNavByUrl() {
 
     // 匹配当前页面
     if (linkFileName === currentFileName) {
-      link.classList.add('active');
+      addActiveStyles(link);
     }
   });
+}
+
+// 添加激活样式（Tailwind CSS）
+function addActiveStyles(link) {
+  link.classList.add('bg-blue-50', 'border', 'border-blue-100');
+  // 更新图标颜色
+  const icon = link.querySelector('svg');
+  if (icon) {
+    icon.classList.remove('group-hover:text-blue-500', 'group-hover:text-red-400');
+    icon.classList.add('text-blue-500');
+  }
+  // 更新文字颜色
+  const text = link.querySelector('span');
+  if (text) {
+    text.classList.add('text-blue-700');
+  }
+}
+
+// 移除激活样式（Tailwind CSS）
+function removeActiveStyles(link) {
+  link.classList.remove('bg-blue-50', 'border', 'border-blue-100', 'active');
+  // 恢复图标颜色
+  const icon = link.querySelector('svg');
+  if (icon) {
+    icon.classList.remove('text-blue-500');
+    // 根据链接类型恢复 hover 样式
+    if (link.id === 'trash-link') {
+      icon.classList.add('group-hover:text-red-400');
+    } else {
+      icon.classList.add('group-hover:text-blue-500');
+    }
+  }
+  // 恢复文字颜色
+  const text = link.querySelector('span');
+  if (text) {
+    text.classList.remove('text-blue-700');
+  }
 }
 
 // 主题切换逻辑（占位）
