@@ -442,6 +442,47 @@ async function deletePaper(paperId) {
 }
 
 // ==================== 回收站功能 ====================
+// 返回文献库
+function returnToLibrary() {
+  console.log('[returnToLibrary] 返回文献库');
+
+  // 清除 URL 参数
+  const newUrl = new URL(window.location.href);
+  newUrl.searchParams.delete('view');
+  window.history.pushState({}, '', newUrl);
+
+  // 恢复页面标题
+  const pageTitle = document.querySelector('.page-title');
+  if (pageTitle) {
+    pageTitle.textContent = '文献库';
+  }
+
+  // 恢复页面副标题
+  const pageSubtitle = document.querySelector('.page-subtitle');
+  if (pageSubtitle) {
+    pageSubtitle.style.display = '';
+  }
+
+  // 显示筛选芯片和工具栏
+  const filterChipsContainer = document.querySelector('.page-header').nextElementSibling;
+  const filterBar = filterChipsContainer?.nextElementSibling;
+  const actionButtons = document.querySelector('.page-header > div:last-child');
+
+  if (filterChipsContainer) filterChipsContainer.style.display = '';
+  if (actionButtons) actionButtons.style.display = '';
+  if (filterBar) filterBar.style.display = '';
+
+  // 更新侧边栏高亮状态
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const libraryLink = document.querySelector('a[href="index.html"]');
+  if (libraryLink) {
+    libraryLink.classList.add('active');
+  }
+
+  // 重新加载文献列表
+  loadPapers();
+}
+
 async function showTrash() {
   console.log('[showTrash] 显示回收站');
 
@@ -458,7 +499,15 @@ async function showTrash() {
     // 更新页面标题
     const pageTitle = document.querySelector('.page-title');
     if (pageTitle) {
-      pageTitle.innerHTML = '回收站 <button class="btn btn-sm btn-secondary" onclick="location.reload()" style="margin-left: 1rem; padding: 0.4rem 0.8rem; font-size: 0.875rem;">返回文献库</button>';
+      pageTitle.innerHTML = '回收站 <button class="btn btn-sm btn-secondary" id="return-to-library-btn" style="margin-left: 1rem; padding: 0.4rem 0.8rem; font-size: 0.875rem;">返回文献库</button>';
+
+      // 绑定返回按钮事件
+      const returnBtn = document.getElementById('return-to-library-btn');
+      if (returnBtn) {
+        returnBtn.addEventListener('click', function() {
+          returnToLibrary();
+        });
+      }
     }
 
     // 隐藏筛选芯片和工具栏
@@ -497,10 +546,19 @@ function renderTrashTable(papers) {
           <div style="font-size: 3rem; margin-bottom: 1rem;">🗑️</div>
           <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">回收站是空的</div>
           <div style="font-size: 0.9rem; color: #999;">删除的文献会暂时保存在这里</div>
-          <button class="btn btn-primary" style="margin-top: 1rem;" onclick="location.href='index.html'">返回文献库</button>
+          <button class="btn btn-primary" id="empty-trash-return-btn" style="margin-top: 1rem;">返回文献库</button>
         </td>
       </tr>
     `;
+
+    // 绑定返回按钮
+    const returnBtn = document.getElementById('empty-trash-return-btn');
+    if (returnBtn) {
+      returnBtn.addEventListener('click', function() {
+        returnToLibrary();
+      });
+    }
+
     return;
   }
 
