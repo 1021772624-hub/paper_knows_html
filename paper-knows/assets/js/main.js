@@ -166,12 +166,48 @@ function initFilterChips() {
   });
 }
 
+// 数据概览折叠逻辑
+function initStatsToggle() {
+  const statsHeader = document.getElementById('stats-header');
+  const statsContent = document.getElementById('stats-content');
+  const statsChevron = document.getElementById('stats-chevron');
+
+  if (!statsHeader || !statsContent || !statsChevron) {
+    return; // 如果元素不存在则跳过
+  }
+
+  // 从 localStorage 读取折叠状态，默认展开
+  const statsCollapsed = localStorage.getItem('statsCollapsed') === 'true';
+
+  if (statsCollapsed) {
+    statsContent.style.display = 'none';
+    statsChevron.style.transform = 'rotate(-90deg)';
+  }
+
+  statsHeader.addEventListener('click', function() {
+    const isCollapsed = statsContent.style.display === 'none';
+
+    if (isCollapsed) {
+      // 展开
+      statsContent.style.display = 'block';
+      statsChevron.style.transform = 'rotate(0deg)';
+      localStorage.setItem('statsCollapsed', 'false');
+    } else {
+      // 折叠
+      statsContent.style.display = 'none';
+      statsChevron.style.transform = 'rotate(-90deg)';
+      localStorage.setItem('statsCollapsed', 'true');
+    }
+  });
+}
+
 // 初始化
 document.addEventListener('DOMContentLoaded', function() {
   initNavigation();
   initThemeToggle();
   initSidebarToggle();
   initFilterChips();
+  initStatsToggle();
 
   console.log('材知道系统已初始化');
 });

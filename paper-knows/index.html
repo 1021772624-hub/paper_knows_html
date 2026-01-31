@@ -107,15 +107,20 @@
         <!-- SECTION 3: 数据概览（位置调整+视觉弱化） -->
         <!-- 移动：从顶部移至回收站下方 -->
         <div class="mt-4 px-2">
-          <div class="bg-gray-50/80 rounded-xl border border-gray-100 p-3">
-            <div class="flex items-center gap-2 mb-2 text-gray-400 border-b border-gray-200/60 pb-1.5">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+          <div class="sidebar-stats bg-gray-50/80 rounded-xl border border-gray-100 p-3">
+            <div class="flex items-center justify-between mb-2 text-gray-400 border-b border-gray-200/60 pb-1.5 cursor-pointer" id="stats-header">
+              <div class="flex items-center gap-2">
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+                </svg>
+                <span class="text-[10px] font-bold uppercase tracking-wider">数据概览</span>
+              </div>
+              <svg class="w-3 h-3 transition-transform duration-200" id="stats-chevron" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
               </svg>
-              <span class="text-[10px] font-bold uppercase tracking-wider">数据概览</span>
             </div>
             <!-- 保持：数据绑定原有变量 -->
-            <div class="space-y-1.5">
+            <div class="space-y-1.5" id="stats-content">
               <div class="flex justify-between items-center text-xs">
                 <span class="text-gray-500">总文献</span>
                 <span class="font-semibold text-gray-700 tabular-nums stat-value">0</span>
@@ -131,6 +136,19 @@
             </div>
           </div>
         </div>
+
+        <!-- 立即应用折叠状态，避免页面跳动 -->
+        <script>
+          (function() {
+            const statsCollapsed = localStorage.getItem('statsCollapsed') === 'true';
+            if (statsCollapsed) {
+              const statsContent = document.getElementById('stats-content');
+              const statsChevron = document.getElementById('stats-chevron');
+              if (statsContent) statsContent.style.display = 'none';
+              if (statsChevron) statsChevron.style.transform = 'rotate(-90deg)';
+            }
+          })();
+        </script>
       </nav>
 
       <!-- SECTION 4: 底部新增区域（登录+主题切换） -->

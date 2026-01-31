@@ -54,7 +54,7 @@
 .sidebar-stats {
   padding: var(--spacing-md);
   border-bottom: 1px solid var(--border-color);
-  display: none;
+  /* display: block; - 默认显示，不再需要 expanded 状态 */
 }
 
 .sidebar.expanded .sidebar-stats {
