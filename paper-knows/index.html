@@ -14,6 +14,7 @@
   <link rel="stylesheet" href="assets/css/modules/stat-cards.css">
   <link rel="stylesheet" href="assets/css/modules/filter-bar.css">
   <link rel="stylesheet" href="assets/css/modules/table.css">
+  <link rel="stylesheet" href="assets/css/glass-morphism.css">
 </head>
 <body>
   <div class="app-container">
@@ -100,72 +101,76 @@
     <main class="main-content">
 
       <!-- MODULE: PAGE_HEADER -->
-      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <div>
-          <h1 class="page-title" style="margin-bottom: 0.5rem;">文献库</h1>
-          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-            <button class="filter-chip active" data-filter="all" style="padding: 0.4rem 1rem; border: 1px solid #e0e0e0; border-radius: 20px; background: #3498db; color: white; cursor: pointer; font-size: 0.875rem; transition: all 0.2s;">
-              全部 <span class="chip-count">0</span>
-            </button>
-            <button class="filter-chip" data-filter="read" style="padding: 0.4rem 1rem; border: 1px solid #e0e0e0; border-radius: 20px; background: white; color: #666; cursor: pointer; font-size: 0.875rem; transition: all 0.2s;">
-              已读 <span class="chip-count">0</span>
-            </button>
-            <button class="filter-chip" data-filter="unread" style="padding: 0.4rem 1rem; border: 1px solid #e0e0e0; border-radius: 20px; background: white; color: #666; cursor: pointer; font-size: 0.875rem; transition: all 0.2s;">
-              未读 <span class="chip-count">0</span>
-            </button>
-            <button class="filter-chip" data-filter="ai-analyzed" style="padding: 0.4rem 1rem; border: 1px solid #e0e0e0; border-radius: 20px; background: white; color: #666; cursor: pointer; font-size: 0.875rem; transition: all 0.2s;">
-              AI精读 <span class="chip-count">0</span>
-            </button>
-            <button class="filter-chip" data-filter="analyzing" style="padding: 0.4rem 1rem; border: 1px solid #e0e0e0; border-radius: 20px; background: white; color: #666; cursor: pointer; font-size: 0.875rem; transition: all 0.2s;">
-              解析中 <span class="chip-count">0</span>
-            </button>
-          </div>
+      <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; padding-bottom: 1rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+          <h1 class="page-title" style="margin-bottom: 0;">文献库</h1>
+          <p class="page-subtitle" style="margin: 0; font-size: 0.875rem; color: #64748b;">管理和组织您的科研文献</p>
         </div>
-        <div style="display: flex; gap: 0.75rem;">
-          <button class="btn btn-secondary" id="batch-analyze-btn" disabled style="padding: 0.6rem 1.2rem; border: 1px solid #ddd; background: white; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">
-            🤖 批量 AI 分析
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <button class="btn btn-secondary" id="batch-analyze-btn" disabled style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+            ✨ 批量 AI 分析
           </button>
-          <button class="btn btn-primary" id="import-pdf-btn" style="padding: 0.6rem 1.2rem; border: none; background: #3498db; color: white; border-radius: 6px; cursor: pointer; font-size: 0.875rem;">
+          <button class="btn btn-primary" id="import-pdf-btn" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
             📤 导入文献
           </button>
         </div>
       </div>
+
+      <!-- 筛选器胶囊 -->
+      <div style="display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+        <button class="filter-chip active" data-filter="all">
+          全部 <span class="chip-count">0</span>
+        </button>
+        <button class="filter-chip" data-filter="read">
+          已读 <span class="chip-count">0</span>
+        </button>
+        <button class="filter-chip" data-filter="unread">
+          未读 <span class="chip-count">0</span>
+        </button>
+        <button class="filter-chip" data-filter="ai-analyzed">
+          AI精读 <span class="chip-count">0</span>
+        </button>
+        <button class="filter-chip" data-filter="analyzing">
+          解析中 <span class="chip-count">0</span>
+        </button>
+      </div>
       <!-- END MODULE: PAGE_HEADER -->
 
       <!-- MODULE: FILTER_BAR -->
-      <div class="filter-bar" style="display: flex; align-items: center; gap: 1rem; padding: 1rem; background: white; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <label style="font-size: 0.875rem; color: #666; white-space: nowrap;">排序</label>
-          <select class="filter-select" id="filter-sort" style="padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
-            <option value="time-desc">导入时间（新到旧）</option>
-            <option value="time-asc">导入时间（旧到新）</option>
-          </select>
-        </div>
-        <div style="display: flex; align-items: center; gap: 0.5rem;">
-          <label style="font-size: 0.875rem; color: #666; white-space: nowrap;">分类</label>
-          <select class="filter-select" id="filter-category" style="padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.875rem; cursor: pointer;">
-            <option value="all">全部分类</option>
-            <option value="material">材料科学</option>
-          </select>
-        </div>
-        <div style="flex: 1; display: flex; align-items: center; gap: 0.5rem;">
-          <input type="text" id="search-input" placeholder="搜索标题、作者、关键词..." style="flex: 1; padding: 0.5rem 0.75rem; border: 1px solid #e0e0e0; border-radius: 6px; font-size: 0.875rem;">
+      <div style="background: rgba(248, 250, 252, 0.6); backdrop-filter: blur(10px); border: 1px solid rgba(226, 232, 240, 0.8); border-radius: 12px; padding: 0.75rem 1rem; margin-bottom: 1.5rem;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <select class="filter-select" id="filter-sort" style="min-width: 140px; font-size: 0.875rem;">
+              <option value="time-desc">导入时间（新到旧）</option>
+              <option value="time-asc">导入时间（旧到新）</option>
+            </select>
+            <select class="filter-select" id="filter-category" style="min-width: 120px; font-size: 0.875rem;">
+              <option value="all">全部分类</option>
+              <option value="material">材料科学</option>
+            </select>
+            <select class="filter-select" style="min-width: 100px; font-size: 0.875rem;">
+              <option value="all">全部状态</option>
+            </select>
+          </div>
+          <div style="flex: 1; max-width: 280px;">
+            <input type="text" id="search-input" placeholder="搜索标题、作者、期刊..." style="font-size: 0.875rem;">
+          </div>
         </div>
       </div>
       <!-- END MODULE: FILTER_BAR -->
 
       <!-- MODULE: CONTENT_AREA -->
-      <div class="content-table-wrapper" style="background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-        <table class="content-table" style="width: 100%; border-collapse: collapse;">
+      <div class="content-table-wrapper">
+        <table class="content-table">
           <thead>
-            <tr style="background: #f8f9fa; border-bottom: 2px solid #e0e0e0;">
-              <th style="width: 40px; padding: 0.75rem; text-align: center;"><input type="checkbox" id="select-all-checkbox"></th>
-              <th style="width: 40%; padding: 0.75rem; text-align: left; font-weight: 600; color: #333;">标题</th>
-              <th style="width: 15%; padding: 0.75rem; text-align: left; font-weight: 600; color: #333;">期刊</th>
-              <th style="width: 8%; padding: 0.75rem; text-align: center; font-weight: 600; color: #333;">年份</th>
-              <th style="width: 10%; padding: 0.75rem; text-align: center; font-weight: 600; color: #333;">导入日期</th>
-              <th style="width: 10%; padding: 0.75rem; text-align: center; font-weight: 600; color: #333;">状态</th>
-              <th style="width: 12%; padding: 0.75rem; text-align: center; font-weight: 600; color: #333;">操作</th>
+            <tr>
+              <th style="width: 48px;"><input type="checkbox" id="select-all-checkbox"></th>
+              <th style="min-width: 400px;">标题</th>
+              <th style="width: 200px;">期刊</th>
+              <th style="width: 80px; text-align: center;">年份</th>
+              <th style="width: 100px; text-align: center;">导入日期</th>
+              <th style="width: 90px; text-align: center;">状态</th>
+              <th style="width: 160px; text-align: center;">操作</th>
             </tr>
           </thead>
           <tbody id="paper-list">

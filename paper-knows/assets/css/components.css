@@ -52,6 +52,66 @@
   background-color: #c0392b;
 }
 
+/* ========== 图标按钮 ========== */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: none;
+  background: transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.icon-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.icon-btn:active {
+  transform: scale(0.95);
+}
+
+.icon-btn-danger:hover {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: #ef4444 !important;
+}
+
+/* 工具提示 */
+.icon-btn[title]:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.icon-btn[title]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 2px;
+  border: 4px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 1000;
+}
+
 /* ========== 卡片组件 ========== */
 .card {
   background-color: var(--bg-white);
@@ -84,6 +144,11 @@
 .badge-success {
   background-color: #dcfce7;
   color: #166534;
+}
+
+.badge-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
 }
 
 .badge-warning {

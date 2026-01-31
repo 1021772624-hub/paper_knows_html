@@ -163,11 +163,11 @@ function renderPaperTable(papers) {
       row.innerHTML = `
         <td style="text-align: center;"><input type="checkbox" class="paper-checkbox" data-paper-id="${paperId}" data-ai-analyzed="${isAiAnalyzed}"></td>
         <td style="padding: 0.75rem;">
-          <div class="paper-title" style="font-weight: 500; color: #333;">${title}</div>
+          <div class="paper-title" style="font-weight: 500; color: #333; line-height: 1.4; max-height: 2.8em; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${title}</div>
         </td>
-        <td style="padding: 0.75rem; color: #666;">${displayJournal}</td>
-        <td style="text-align: center; padding: 0.75rem; color: #666;">${displayYear}</td>
-        <td style="text-align: center; padding: 0.75rem; color: #666;">${displayImportDate}</td>
+        <td style="padding: 0.75rem; color: #666; font-size: 0.8125rem;">${displayJournal}</td>
+        <td style="text-align: center; padding: 0.75rem; color: #666; font-size: 0.875rem;">${displayYear}</td>
+        <td style="text-align: center; padding: 0.75rem; color: #94a3b8; font-size: 0.8125rem;">${displayImportDate}</td>
         <td style="text-align: center; padding: 0.75rem;">
           <span class="badge ${isRead ? 'badge-success' : 'badge-secondary'}"
                 style="cursor: pointer; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;"
@@ -178,13 +178,26 @@ function renderPaperTable(papers) {
           </span>
         </td>
         <td style="text-align: center; padding: 0.75rem;">
-          ${isAiAnalyzed
-            ? `<span class="badge badge-success" style="margin-right: 0.5rem; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;">✅ 已分析</span>
-               <button class="btn btn-sm btn-primary" data-action="view-analysis" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">查看分析</button>`
-            : `<button class="btn btn-sm btn-primary" data-action="ai-analyze" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">🤖 AI 辅助阅读</button>`
-          }
-          <button class="btn btn-sm btn-secondary" data-action="view-pdf" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; margin-left: 0.25rem;">查看 PDF</button>
-          <button class="btn btn-sm btn-danger" data-action="delete-paper" data-paper-id="${paperId}" style="padding: 0.4rem 0.8rem; font-size: 0.75rem; margin-left: 0.25rem;">删除</button>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
+            ${isAiAnalyzed
+              ? `<button class="icon-btn" data-action="view-analysis" data-paper-id="${paperId}" title="查看分析" style="color: #6366f1;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+                 </button>
+                 <button class="icon-btn" data-action="ai-analyze" data-paper-id="${paperId}" title="AI 辅助阅读" style="color: #8b5cf6;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                 </button>`
+              : `<button class="icon-btn" data-action="ai-analyze" data-paper-id="${paperId}" title="AI 辅助阅读" style="color: #8b5cf6;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                 </button>`
+            }
+            <span style="width: 1px; height: 16px; background: rgba(226, 232, 240, 0.6); margin: 0 0.25rem;"></span>
+            <button class="icon-btn" data-action="view-pdf" data-paper-id="${paperId}" title="查看 PDF" style="color: #64748b;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            </button>
+            <button class="icon-btn icon-btn-danger" data-action="delete-paper" data-paper-id="${paperId}" title="删除" style="color: #64748b;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+            </button>
+          </div>
         </td>
       `;
       tbody.appendChild(row);
