@@ -21,10 +21,10 @@
   <div class="app-container">
 
     <!-- MODULE: SIDEBAR -->
-    <aside class="fixed left-0 top-0 w-64 bg-white border-r border-gray-200 flex flex-col h-screen shadow-sm z-50">
+    <aside class="sidebar fixed left-0 top-0 w-64 bg-white border-r border-gray-200 flex flex-col h-screen shadow-sm z-50 transition-all duration-300">
 
       <!-- SECTION 1: Logo品牌强化（宣传用） -->
-      <div class="p-6 border-b border-gray-100 shrink-0">
+      <div class="p-6 border-b border-gray-100 shrink-0 cursor-pointer hover:bg-gray-50 transition-colors" id="logo-section">
         <div class="flex items-center gap-3 mb-2">
           <!-- 新增：品牌图标，保持原配色蓝白体系 -->
           <div class="w-11 h-11 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center text-white flex-shrink-0 shadow-lg shadow-blue-500/20">
@@ -186,11 +186,18 @@
     </aside>
     <!-- END MODULE: SIDEBAR -->
 
+    <!-- 立即应用侧边栏状态，避免闪烁 -->
     <script>
       (function() {
-        const sidebarExpanded = localStorage.getItem('sidebarExpanded') === 'true';
-        if (sidebarExpanded) {
-          document.querySelector('.sidebar').classList.add('expanded');
+        const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+        const sidebar = document.querySelector('.sidebar');
+        const mainContent = document.querySelector('.main-content');
+
+        if (sidebarCollapsed && sidebar) {
+          sidebar.classList.add('collapsed');
+          if (mainContent) {
+            mainContent.style.marginLeft = '64px';
+          }
         }
       })();
     </script>
@@ -212,5 +219,26 @@
   <script src="assets/js/mock-data.js?v=1"></script>
   <script src="assets/js/main.js?v=8"></script>
   <script src="assets/js/pages/recommend.js?v=1"></script>
+
+  <!-- 侧边栏折叠功能 -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const logoSection = document.getElementById('logo-section');
+      const sidebar = document.querySelector('.sidebar');
+      const mainContent = document.querySelector('.main-content');
+
+      if (logoSection && sidebar && mainContent) {
+        logoSection.addEventListener('click', function() {
+          const isCollapsed = sidebar.classList.toggle('collapsed');
+
+          // 更新主内容区域的左边距
+          mainContent.style.marginLeft = isCollapsed ? '64px' : '256px';
+
+          // 保存状态到 localStorage
+          localStorage.setItem('sidebarCollapsed', isCollapsed);
+        });
+      }
+    });
+  </script>
 </body>
 </html>

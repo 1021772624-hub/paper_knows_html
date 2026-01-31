@@ -3,6 +3,16 @@
    职责：Logo、统计信息、导航、设置区域
    ======================================== */
 
+/* 侧边栏基础样式 */
+.sidebar {
+  width: 256px;
+  transition: width 0.3s ease;
+}
+
+.sidebar.collapsed {
+  width: 64px;
+}
+
 /* Logo 区域 */
 .sidebar-logo {
   padding: var(--spacing-lg) var(--spacing-md);
@@ -190,3 +200,70 @@
 .sidebar.expanded .version-info {
   display: block;
 }
+
+/* 折叠状态下隐藏文本元素 */
+.sidebar.collapsed h1,
+.sidebar.collapsed p,
+.sidebar.collapsed .text-\[11px\],
+.sidebar.collapsed nav > div > div:first-child,
+.sidebar.collapsed nav a span,
+.sidebar.collapsed .sidebar-stats,
+.sidebar.collapsed .sidebar-footer > a > div:nth-child(2),
+.sidebar.collapsed .sidebar-footer > a > svg:last-child,
+.sidebar.collapsed #theme-toggle span,
+.sidebar.collapsed #theme-toggle > div:last-child,
+.sidebar.collapsed .version-info {
+  display: none !important;
+}
+
+/* 折叠状态下调整元素布局 */
+.sidebar.collapsed #logo-section {
+  padding: 1.5rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.sidebar.collapsed #logo-section > div:first-child {
+  margin-bottom: 0;
+}
+
+.sidebar.collapsed nav a {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed nav a svg {
+  width: 24px !important;
+  height: 24px !important;
+  transition: none !important;
+}
+
+.sidebar.collapsed .sidebar-footer > a {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed .sidebar-footer > a > div:first-child {
+  width: 24px !important;
+  height: 24px !important;
+  transition: none !important;
+}
+
+.sidebar.collapsed .sidebar-footer > a > div:first-child svg {
+  width: 24px !important;
+  height: 24px !important;
+  transition: none !important;
+}
+
+.sidebar.collapsed #theme-toggle {
+  justify-content: center;
+  padding: 0.75rem;
+}
+
+.sidebar.collapsed #theme-toggle svg {
+  width: 24px !important;
+  height: 24px !important;
+  transition: none !important;
+}
+
