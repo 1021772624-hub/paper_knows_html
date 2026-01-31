@@ -169,25 +169,23 @@ function renderPaperTable(papers) {
         <td style="text-align: center; padding: 0.75rem; color: #666; font-size: 0.875rem;">${displayYear}</td>
         <td style="text-align: center; padding: 0.75rem; color: #94a3b8; font-size: 0.8125rem;">${displayImportDate}</td>
         <td style="text-align: center; padding: 0.75rem;">
-          <span class="badge ${isRead ? 'badge-success' : 'badge-secondary'}"
-                style="cursor: pointer; padding: 0.25rem 0.75rem; border-radius: 12px; font-size: 0.75rem;"
+          <span class="status-dot ${isRead ? 'emerald' : 'slate'}"
+                data-tooltip="${isRead ? '已读' : '未读'}"
                 data-action="toggle-read"
                 data-paper-id="${paperId}"
-                title="点击切换已读/未读状态">
-            ${isRead ? '✓ 已读' : '未读'}
-          </span>
+                style="cursor: pointer;"></span>
         </td>
         <td style="text-align: center; padding: 0.75rem;">
           <div style="display: flex; align-items: center; justify-content: center; gap: 0.25rem;">
             ${isAiAnalyzed
-              ? `<button class="icon-btn" data-action="view-analysis" data-paper-id="${paperId}" title="查看分析" style="color: #6366f1;">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+              ? `<button class="icon-btn" data-action="ai-analyze" data-paper-id="${paperId}" title="AI 辅助阅读" style="color: #8b5cf6;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle><path d="M9 14h6"></path></svg>
                  </button>
-                 <button class="icon-btn" data-action="ai-analyze" data-paper-id="${paperId}" title="AI 辅助阅读" style="color: #8b5cf6;">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                 <button class="icon-btn" data-action="view-analysis" data-paper-id="${paperId}" title="查看分析" style="color: #6366f1;">
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
                  </button>`
               : `<button class="icon-btn" data-action="ai-analyze" data-paper-id="${paperId}" title="AI 辅助阅读" style="color: #8b5cf6;">
-                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path><circle cx="9" cy="10" r="1"></circle><circle cx="15" cy="10" r="1"></circle><path d="M9 14h6"></path></svg>
                  </button>`
             }
             <span style="width: 1px; height: 16px; background: rgba(226, 232, 240, 0.6); margin: 0 0.25rem;"></span>

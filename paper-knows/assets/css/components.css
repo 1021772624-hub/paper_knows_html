@@ -166,6 +166,63 @@
   color: #991b1b;
 }
 
+/* ========== 状态圆点 ========== */
+.status-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  position: relative;
+  cursor: help;
+}
+
+.status-dot.emerald {
+  background-color: #10b981;
+}
+
+.status-dot.slate {
+  background-color: #94a3b8;
+}
+
+.status-dot.amber {
+  background-color: #f59e0b;
+}
+
+.status-dot.violet {
+  background-color: #8b5cf6;
+}
+
+/* 状态圆点工具提示 */
+.status-dot[data-tooltip]:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 8px;
+  padding: 4px 8px;
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  border-radius: 4px;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.status-dot[data-tooltip]:hover::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-bottom: 2px;
+  border: 4px solid transparent;
+  border-top-color: rgba(0, 0, 0, 0.8);
+  pointer-events: none;
+  z-index: 1000;
+}
+
 /* ========== 表单组件 ========== */
 .form-group {
   display: flex;
