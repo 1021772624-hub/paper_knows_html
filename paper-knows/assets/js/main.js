@@ -50,6 +50,9 @@ function setActiveNavByUrl() {
     const href = link.getAttribute('href');
     if (!href) return;
 
+    // 跳过回收站链接（已在上面处理）
+    if (link.id === 'trash-link') return;
+
     // 提取链接的路径部分（不包含查询参数）
     const linkPath = href.split('?')[0];
     const linkFileName = linkPath.split('/').pop();

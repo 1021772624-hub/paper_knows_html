@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>材料预测 - Paper Knows</title>
+  <title>第五范式材料发现平台 - AI4Science固态电解质</title>
   <!-- CSS 引入 -->
   <link rel="stylesheet" href="assets/css/base.css">
   <link rel="stylesheet" href="assets/css/layout.css">
@@ -11,207 +11,93 @@
   <link rel="stylesheet" href="assets/css/modules/sidebar.css">
   <link rel="stylesheet" href="assets/css/modules/header.css">
   <link rel="stylesheet" href="assets/css/modules/stat-cards.css">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    /* 页面特定样式 */
-
-    /* 概览卡片 */
-    .overview-section {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
+    body {
+      font-family: 'Inter', 'Noto Sans SC', sans-serif;
+      background: linear-gradient(135deg, #f0f4ff 0%, #faf5ff 50%, #f0f9ff 100%);
+      min-height: 100vh;
     }
 
-    .overview-card {
-      background: var(--bg-white);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      text-align: center;
-      transition: all 0.2s ease;
+    /* 柔和阴影 */
+    .soft-shadow {
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05), 0 2px 8px -1px rgba(0, 0, 0, 0.02);
     }
 
-    .overview-card:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    .hover-shadow {
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .hover-shadow:hover {
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
       transform: translateY(-2px);
     }
 
-    .overview-card .label {
-      font-size: 0.875rem;
-      color: var(--color-gray-600);
-      margin-bottom: 0.5rem;
+    /* 渐变文字 */
+    .gradient-text {
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #2563eb 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
-    .overview-card .value {
-      font-size: 1rem;
-      color: var(--color-primary);
-      font-weight: 600;
+    /* 玻璃拟态卡片 */
+    .glass-card {
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.6);
     }
 
-    /* Section */
-    .content-section {
-      background: var(--bg-white);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 2rem;
-      margin-bottom: 1.5rem;
+    /* 动画 */
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-5px); }
     }
+    .float-anim { animation: float 4s ease-in-out infinite; }
 
-    .content-section h2 {
-      font-size: 1.5rem;
-      color: var(--color-gray-900);
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid var(--color-primary);
+    @keyframes pulse-soft {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.2); }
+      50% { box-shadow: 0 0 0 10px rgba(79, 70, 229, 0); }
     }
+    .pulse-ring { animation: pulse-soft 2s infinite; }
 
-    /* 流程步骤 */
-    .flow-container {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1rem;
+    /* 流程线 */
+    .flow-line {
       position: relative;
     }
-
-    .flow-step {
-      background: var(--bg-hover);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius-sm);
-      padding: 1.25rem;
-      position: relative;
-      transition: all 0.2s ease;
-    }
-
-    .flow-step:hover {
-      border-color: var(--color-primary);
-      box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
-    }
-
-    .flow-step::after {
-      content: '→';
+    .flow-line::after {
+      content: '';
       position: absolute;
-      right: -1.5rem;
       top: 50%;
+      right: -2rem;
+      width: 2rem;
+      height: 2px;
+      background: linear-gradient(90deg, #cbd5e1 0%, #94a3b8 100%);
       transform: translateY(-50%);
-      color: var(--color-primary);
-      font-size: 1.25rem;
-      font-weight: bold;
     }
-
-    .flow-step:last-child::after {
-      display: none;
-    }
-
-    .flow-step .title {
-      font-size: 0.95rem;
-      color: var(--color-gray-900);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .flow-step .desc {
-      font-size: 0.85rem;
-      color: var(--color-gray-600);
-      line-height: 1.5;
-    }
-
-    /* 能力卡片 */
-    .capability-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .capability-card {
-      background: var(--bg-white);
-      border: 1px solid var(--border-color);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      transition: all 0.2s ease;
-    }
-
-    .capability-card:hover {
-      border-color: var(--color-primary);
-      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .capability-card .title {
-      font-size: 1.1rem;
-      color: var(--color-gray-900);
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
-
-    .capability-card .desc {
-      font-size: 0.9rem;
-      color: var(--color-gray-600);
-      line-height: 1.6;
-    }
-
-    /* 输出示例 */
-    .output-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .output-card {
-      background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
-      border: 1px solid var(--color-info);
-      border-radius: var(--border-radius);
-      padding: 1.5rem;
-      transition: all 0.2s ease;
-    }
-
-    .output-card:hover {
-      box-shadow: 0 4px 12px rgba(6, 182, 212, 0.15);
-    }
-
-    .output-card .title {
-      font-size: 1.1rem;
-      color: var(--color-gray-900);
-      font-weight: 600;
-      margin-bottom: 0.75rem;
-    }
-
-    .output-card .desc {
-      font-size: 0.95rem;
-      color: var(--color-gray-700);
-      line-height: 1.6;
-    }
-
-    /* 操作按钮 */
-    .action-section {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      margin-top: 2rem;
-      flex-wrap: wrap;
-    }
-
-    /* 响应式 */
     @media (max-width: 768px) {
-      .flow-container {
-        grid-template-columns: 1fr;
-      }
+      .flow-line::after { display: none; }
+    }
 
-      .flow-step::after {
-        content: '↓';
-        right: 50%;
-        top: auto;
-        bottom: -1.5rem;
-        transform: translateX(50%);
-      }
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: #f1f5f9; }
+    ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-      .capability-grid,
-      .output-grid {
-        grid-template-columns: 1fr;
-      }
+    /* 标签样式 */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
     }
   </style>
 </head>
-<body>
+<body class="text-slate-800 antialiased">
   <div class="app-container">
     <!-- MODULE: SIDEBAR -->
     <aside class="sidebar">
@@ -291,116 +177,528 @@
     </script>
 
     <!-- 主内容区 -->
-    <main class="main-content">
+    <main class="main-content" style="padding-top: 0; padding-left: 0; padding-right: 0;">
+
       <!-- MODULE: PAGE_HEADER -->
-      <div class="page-header">
-        <h1 class="page-title">材料预测</h1>
-        <p class="page-subtitle">人工智能驱动的固态电池关键材料预测与研发辅助</p>
+      <div class="page-header" style="position: sticky; top: 0; z-index: 40; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); margin: 0 0 1.5rem 0; padding: 1rem 1.5rem; border-bottom: 1px solid rgba(0,0,0,0.05);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <h1 class="page-title" style="margin-bottom: 0;">材料预测</h1>
+            <p class="page-subtitle" style="margin: 0; font-size: 0.875rem; color: #64748b;">第五范式 AI 驱动的材料发现平台</p>
+          </div>
+        </div>
       </div>
       <!-- END MODULE: PAGE_HEADER -->
 
-      <!-- 概览卡片 -->
-      <div class="overview-section">
-          <div class="overview-card">
-            <div class="label">分析材料体系</div>
-            <div class="value">固态电解质 · 电极 · 界面</div>
+      <!-- Hero Section -->
+      <header class="relative overflow-hidden pt-16 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+        <div class="text-center max-w-4xl mx-auto">
+          <div class="inline-flex items-center px-4 py-2 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 text-sm font-medium mb-6">
+            <span class="w-2 h-2 rounded-full bg-indigo-500 mr-2 animate-pulse"></span>
+            The Fifth Paradigm: AI-Driven Materials Discovery
           </div>
-          <div class="overview-card">
-            <div class="label">预测目标</div>
-            <div class="value">性能 · 稳定性 · 可行性</div>
-          </div>
-          <div class="overview-card">
-            <div class="label">数据来源</div>
-            <div class="value">文献 + 模型 + 历史实验</div>
-          </div>
-        </div>
 
-        <!-- AI 材料预测流程 -->
-        <div class="content-section">
-          <h2>AI 材料预测流程</h2>
-          <div class="flow-container">
-            <div class="flow-step">
-              <div class="title">文献与数据输入</div>
-              <div class="desc">固态电解质、电极与界面相关文献，以及已有实验与计算数据</div>
+          <h1 class="text-4xl md:text-6xl font-bold tracking-tight mb-6">
+            <span class="gradient-text">第五范式</span>
+            <span class="text-slate-800">发现固态电解质</span>
+          </h1>
+
+          <p class="text-lg text-slate-600 leading-relaxed mb-10 max-w-2xl mx-auto">
+            基于主动学习、贝叶斯优化与机器人自动化的闭环系统，
+            从数千万候选材料中自主发现并合成高性能固态电池电解质，
+            开启材料研发的新纪元。
+          </p>
+
+          <!-- 核心指标卡片 -->
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100">
+              <div class="text-3xl font-bold text-indigo-600 mb-1">10⁸</div>
+              <div class="text-sm text-slate-500">候选材料库</div>
             </div>
-            <div class="flow-step">
-              <div class="title">特征与描述符构建</div>
-              <div class="desc">成分、晶体结构、缺陷类型、离子迁移通道、界面反应特征</div>
+            <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100">
+              <div class="text-3xl font-bold text-purple-600 mb-1">50</div>
+              <div class="text-sm text-slate-500">实验迭代次数</div>
             </div>
-            <div class="flow-step">
-              <div class="title">关键性能预测</div>
-              <div class="desc">离子电导率、电化学稳定窗口、界面相容性</div>
+            <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100">
+              <div class="text-3xl font-bold text-blue-600 mb-1">70%</div>
+              <div class="text-sm text-slate-500">效率提升</div>
             </div>
-            <div class="flow-step">
-              <div class="title">多目标权衡分析</div>
-              <div class="desc">性能、稳定性与工艺可行性的综合评估</div>
-            </div>
-            <div class="flow-step">
-              <div class="title">候选材料输出</div>
-              <div class="desc">给出优先级明确的候选材料与优化方向</div>
+            <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100">
+              <div class="text-3xl font-bold text-cyan-600 mb-1">24/7</div>
+              <div class="text-sm text-slate-500">自主运行</div>
             </div>
           </div>
         </div>
+      </header>
 
-        <!-- 预测能力 -->
-        <div class="content-section">
-          <h2>固态电池材料预测能力</h2>
-          <div class="capability-grid">
-            <div class="capability-card">
-              <div class="title">固态电解质筛选</div>
-              <div class="desc">预测不同材料体系的离子电导率上限与稳定区间</div>
+      <!-- 五大范式分类 -->
+      <section class="py-12 px-4 max-w-7xl mx-auto">
+        <h2 class="text-2xl font-bold text-slate-800 mb-8 text-center">科学研究范式演进</h2>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+          <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100 text-center group cursor-pointer opacity-60 hover:opacity-100 transition">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-100 flex items-center justify-center text-2xl group-hover:bg-slate-200 transition">🧪</div>
+            <h3 class="font-semibold text-slate-700 mb-1">第一范式</h3>
+            <p class="text-xs text-slate-500">实验科学<br>试错积累</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100 text-center group cursor-pointer opacity-60 hover:opacity-100 transition">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-100 flex items-center justify-center text-2xl group-hover:bg-slate-200 transition">📐</div>
+            <h3 class="font-semibold text-slate-700 mb-1">第二范式</h3>
+            <p class="text-xs text-slate-500">理论科学<br>物理建模</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100 text-center group cursor-pointer opacity-60 hover:opacity-100 transition">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-slate-100 flex items-center justify-center text-2xl group-hover:bg-slate-200 transition">💻</div>
+            <h3 class="font-semibold text-slate-700 mb-1">第三范式</h3>
+            <p class="text-xs text-slate-500">计算科学<br>模拟仿真</p>
+          </div>
+
+          <div class="bg-white rounded-2xl p-6 soft-shadow hover-shadow border border-slate-100 text-center group cursor-pointer opacity-80 hover:opacity-100 transition">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-blue-50 flex items-center justify-center text-2xl group-hover:bg-blue-100 transition">📊</div>
+            <h3 class="font-semibold text-slate-700 mb-1">第四范式</h3>
+            <p class="text-xs text-slate-500">数据科学<br>大数据挖掘</p>
+          </div>
+
+          <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 soft-shadow hover-shadow text-center group cursor-pointer transform scale-105">
+            <div class="w-12 h-12 mx-auto mb-3 rounded-xl bg-white/20 flex items-center justify-center text-2xl pulse-ring">🤖</div>
+            <h3 class="font-semibold text-white mb-1">第五范式</h3>
+            <p class="text-xs text-indigo-100">AI4Science<br>智能驱动</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- 功能特性 -->
+      <section class="py-12 px-4 max-w-7xl mx-auto">
+        <div class="grid md:grid-cols-3 gap-6">
+          <div class="flex items-start space-x-4 bg-white/60 rounded-2xl p-6 border border-white">
+            <div class="w-10 h-10 rounded-lg bg-indigo-100 flex items-center justify-center text-indigo-600 flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             </div>
-            <div class="capability-card">
-              <div class="title">掺杂与成分优化</div>
-              <div class="desc">评估掺杂元素对传导机制与结构稳定性的影响</div>
+            <div>
+              <h4 class="font-semibold text-slate-800 mb-1">主动学习优化</h4>
+              <p class="text-sm text-slate-600">贝叶斯策略智能选择实验点，平衡探索与利用，最大化信息增益</p>
             </div>
-            <div class="capability-card">
-              <div class="title">界面相容性预测</div>
-              <div class="desc">判断电解质与电极之间潜在反应与副相风险</div>
+          </div>
+
+          <div class="flex items-start space-x-4 bg-white/60 rounded-2xl p-6 border border-white">
+            <div class="w-10 h-10 rounded-lg bg-purple-100 flex items-center justify-center text-purple-600 flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
             </div>
-            <div class="capability-card">
-              <div class="title">结构-性能归因</div>
-              <div class="desc">识别限制离子迁移的关键结构或缺陷因素</div>
+            <div>
+              <h4 class="font-semibold text-slate-800 mb-1">闭环自动化</h4>
+              <p class="text-sm text-slate-600">机器人合成平台联动表征设备，实现 Design-Synthesize-Characterize 无人值守循环</p>
             </div>
-            <div class="capability-card">
-              <div class="title">材料体系对比</div>
-              <div class="desc">横向比较硫化物、氧化物、聚合物固态电解质</div>
+          </div>
+
+          <div class="flex items-start space-x-4 bg-white/60 rounded-2xl p-6 border border-white">
+            <div class="w-10 h-10 rounded-lg bg-cyan-100 flex items-center justify-center text-cyan-600 flex-shrink-0">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
             </div>
-            <div class="capability-card">
-              <div class="title">实验路径建议</div>
-              <div class="desc">输出可落地的材料制备与性能优化思路</div>
+            <div>
+              <h4 class="font-semibold text-slate-800 mb-1">多尺度模拟</h4>
+              <p class="text-sm text-slate-600">从DFT第一性原理到机器学习力场(ML-IAP)，跨越量子到宏观尺度快速预测</p>
             </div>
           </div>
         </div>
+      </section>
 
-        <!-- 预测输出示例 -->
-        <div class="content-section">
-          <h2>AI 预测输出示例</h2>
-          <div class="output-grid">
-            <div class="output-card">
-              <div class="title">候选材料方向</div>
-              <div class="desc">
-                硫化物固态电解质中，特定元素掺杂有望在保持稳定性的同时提升室温离子电导率
+      <!-- 核心发现流程 -->
+      <section class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="bg-white rounded-3xl soft-shadow border border-slate-200 overflow-hidden">
+          <div class="p-8 border-b border-slate-100">
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">闭环自主发现工作流</h2>
+            <p class="text-slate-600">CAMEO (Closed-Loop Autonomous Materials Exploration & Optimization) 架构实现全流程智能化</p>
+          </div>
+
+          <div class="p-8">
+            <div class="grid md:grid-cols-4 gap-8 relative">
+              <!-- 连接线 (桌面端) -->
+              <div class="hidden md:block absolute top-1/4 left-0 right-0 h-0.5 bg-gradient-to-r from-indigo-200 via-purple-200 to-cyan-200 -z-10"></div>
+
+              <!-- Step 1 -->
+              <div class="relative text-center flow-line">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 flex items-center justify-center text-2xl float-anim">
+                  🧠
+                </div>
+                <div class="inline-block px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-semibold mb-2">Step 1</div>
+                <h3 class="font-bold text-slate-800 mb-2">智能设计</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  生成式AI基于先验知识提出候选配方<br>
+                  <span class="text-xs text-slate-400 mt-1 block">Gaussian Process构建替代模型</span>
+                </p>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="relative text-center flow-line">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 flex items-center justify-center text-2xl float-anim" style="animation-delay: 0.5s;">
+                  ⚗️
+                </div>
+                <div class="inline-block px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-semibold mb-2">Step 2</div>
+                <h3 class="font-bold text-slate-800 mb-2">机器人合成</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  自动配料→球磨→压片→热处理<br>
+                  <span class="text-xs text-slate-400 mt-1 block">高通量制备阵列样品(1000样/天)</span>
+                </p>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="relative text-center flow-line">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-cyan-50 to-cyan-100 border border-cyan-200 flex items-center justify-center text-2xl float-anim" style="animation-delay: 1s;">
+                  🔬
+                </div>
+                <div class="inline-block px-3 py-1 rounded-full bg-cyan-50 text-cyan-600 text-xs font-semibold mb-2">Step 3</div>
+                <h3 class="font-bold text-slate-800 mb-2">自动表征</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  XRD结构解析 + EIS电导率测试<br>
+                  <span class="text-xs text-slate-400 mt-1 block">实时数据传输至AI中枢</span>
+                </p>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="relative text-center">
+                <div class="w-16 h-16 mx-auto mb-4 rounded-2xl bg-gradient-to-br from-green-50 to-green-100 border border-green-200 flex items-center justify-center text-2xl float-anim" style="animation-delay: 1.5s;">
+                  🔄
+                </div>
+                <div class="inline-block px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-semibold mb-2">Step 4</div>
+                <h3 class="font-bold text-slate-800 mb-2">主动学习</h3>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                  更新 Surrogate Model<br>
+                  <span class="text-xs text-slate-400 mt-1 block">采集函数选择下一实验点，循环优化</span>
+                </p>
               </div>
             </div>
-            <div class="output-card">
-              <div class="title">风险提示</div>
-              <div class="desc">
-                高电导率材料可能在高电压正极下存在界面反应风险，需配合界面工程
+
+            <!-- 系统状态监控 -->
+            <div class="mt-12 bg-slate-50 rounded-2xl p-6 border border-slate-200">
+              <div class="flex items-center justify-between mb-4">
+                <h4 class="font-semibold text-slate-800 flex items-center">
+                  <span class="w-2 h-2 bg-green-500 rounded-full mr-2 animate-pulse"></span>
+                  系统实时监控
+                </h4>
+                <span class="text-xs text-slate-500 font-mono">ID: SDL-SSB-2025-001</span>
+              </div>
+              <div class="grid md:grid-cols-3 gap-4 text-sm">
+                <div class="bg-white rounded-lg p-3 border border-slate-200">
+                  <span class="text-slate-500 text-xs">当前状态</span>
+                  <div class="font-mono text-indigo-600 font-semibold mt-1">Active Learning Iteration #12</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 border border-slate-200">
+                  <span class="text-slate-500 text-xs">候选材料</span>
+                  <div class="font-mono text-purple-600 font-semibold mt-1">Li₆PS₅Cl₀.₅Br₀.₅</div>
+                </div>
+                <div class="bg-white rounded-lg p-3 border border-slate-200">
+                  <span class="text-slate-500 text-xs">预测电导率</span>
+                  <div class="font-mono text-cyan-600 font-semibold mt-1">12.4 mS/cm</div>
+                </div>
+              </div>
+              <div class="mt-4 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-500 w-3/4 animate-pulse"></div>
+              </div>
+              <div class="flex justify-between mt-2 text-xs text-slate-500">
+                <span>探索进度</span>
+                <span>75%</span>
               </div>
             </div>
           </div>
         </div>
+      </section
+      <!-- 最新研究/发现成果 -->
+      <section class="py-12 px-4 max-w-7xl mx-auto">
+        <div class="flex flex-col md:flex-row md:items-center justify-between mb-8 gap-4">
+          <div>
+            <h2 class="text-2xl font-bold text-slate-800">最新研究发现</h2>
+            <p class="text-slate-600 mt-1">基于第五范式自主发现的固态电解质材料库</p>
+          </div>
 
-        <!-- 操作按钮 -->
-        <div class="action-section">
-          <button class="btn btn-primary" onclick="alert('AI 材料预测功能开发中...')">
-            🤖 启动 AI 材料预测
-          </button>
-          <button class="btn btn-secondary" onclick="window.location.href='index.html'">
-            📄 返回文献库
+          <!-- 搜索与筛选 -->
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div class="relative">
+              <input type="text" placeholder="搜索材料、性能指标..." 
+                     class="pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 bg-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent w-64 text-sm">
+              <svg class="w-5 h-5 text-slate-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <select class="px-4 py-2.5 rounded-xl border border-slate-200 bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+              <option>全部领域</option>
+              <option>硫化物电解质</option>
+              <option>卤化物电解质</option>
+              <option>氧化物电解质</option>
+              <option>复合电解质</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- 文章/材料卡片列表 -->
+        <div class="space-y-4">
+          <!-- Card 1 -->
+          <article class="bg-white rounded-2xl p-6 soft-shadow border border-slate-100 hover-shadow cursor-pointer group" onclick="showDetail('li3bis3')">
+            <div class="flex flex-col md:flex-row gap-6">
+              <!-- 左侧视觉展示 -->
+              <div class="md:w-48 h-32 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 border border-blue-200 flex items-center justify-center flex-shrink-0 overflow-hidden relative">
+                <div class="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.3)_0%,transparent_70%)]"></div>
+                <div class="text-center z-10">
+                  <div class="text-2xl font-bold text-indigo-600 font-mono">Li₃BiS₃</div>
+                  <div class="text-xs text-indigo-400 mt-1">Sulfide</div>
+                </div>
+              </div>
+
+              <!-- 右侧内容 -->
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="tag bg-blue-50 text-blue-600 border border-blue-100">硫化物</span>
+                  <span class="tag bg-green-50 text-green-600 border border-green-100">实验验证 ✓</span>
+                  <span class="text-xs text-slate-400 ml-auto">2024-12-15</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-indigo-600 transition">Li₃BiS₃ 超离子导体：CNN+MD分层筛选策略发现</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                  利用卷积神经网络预筛选20,717种含锂材料，结合随机森林与支持向量机分类，通过支持向量回归(SVR)预测迁移能垒。室温离子电导率达1.4 mS/cm，合成温度仅需300°C...
+                </p>
+                <div class="flex items-center gap-4 text-xs text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    σ = 1.4 mS/cm
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                    合成温度 300°C
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    对锂稳定
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 2 -->
+          <article class="bg-white rounded-2xl p-6 soft-shadow border border-slate-100 hover-shadow cursor-pointer group" onclick="showDetail('halide')">
+            <div class="flex flex-col md:flex-row gap-6">
+              <div class="md:w-48 h-32 rounded-xl bg-gradient-to-br from-purple-50 to-pink-100 border border-purple-200 flex items-center justify-center flex-shrink-0">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-purple-600 font-mono">Li-M-Cl</div>
+                  <div class="text-xs text-purple-400 mt-1">Halide</div>
+                </div>
+              </div>
+
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="tag bg-purple-50 text-purple-600 border border-purple-100">卤化物</span>
+                  <span class="tag bg-indigo-50 text-indigo-600 border border-indigo-100">反钙钛矿</span>
+                  <span class="text-xs text-slate-400 ml-auto">2024-11-28</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-purple-600 transition">几何-动力学描述符筛选反钙钛矿卤化物电解质</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                  结合键价法(Bond Valence)与图神经网络(GNN)构建Li⁺能量景观图，利用几何-动力学描述符(t/η)指导合成。发现系列高电压稳定性卤化物，电化学窗口达0-4.3V...
+                </p>
+                <div class="flex items-center gap-4 text-xs text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    σ = 2.1 mS/cm
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                    电压窗口 4.3V
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    湿度稳定
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+
+          <!-- Card 3 -->
+          <article class="bg-white rounded-2xl p-6 soft-shadow border border-slate-100 hover-shadow cursor-pointer group" onclick="showDetail('lina')">
+            <div class="flex flex-col md:flex-row gap-6">
+              <div class="md:w-48 h-32 rounded-xl bg-gradient-to-br from-orange-50 to-red-100 border border-orange-200 flex items-center justify-center flex-shrink-0">
+                <div class="text-center">
+                  <div class="text-2xl font-bold text-orange-600 font-mono">Li/Na</div>
+                  <div class="text-xs text-orange-400 mt-1">Hybrid</div>
+                </div>
+              </div>
+
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="tag bg-orange-50 text-orange-600 border border-orange-100">混合离子</span>
+                  <span class="tag bg-red-50 text-red-600 border border-red-100">颠覆性发现</span>
+                  <span class="text-xs text-slate-400 ml-auto">2024-10-10</span>
+                </div>
+                <h3 class="text-lg font-bold text-slate-800 mb-2 group-hover:text-orange-600 transition">Li-Na双离子导体：Azure Quantum筛选突破</h3>
+                <p class="text-slate-600 text-sm leading-relaxed mb-3">
+                  Microsoft Azure与PNNL合作，利用云端AI在80计算小时内从3200万种无机物中筛选。发现锂含量降低70%仍保持高电导率的混合体系，颠覆传统认知...
+                </p>
+                <div class="flex items-center gap-4 text-xs text-slate-500">
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                    锂含量 ↓70%
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"/></svg>
+                    成本大幅降低
+                  </span>
+                  <span class="flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    抑制枝晶
+                  </span>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+
+        <div class="mt-8 text-center">
+          <button class="px-6 py-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:bg-slate-50 hover:border-slate-300 transition text-sm font-medium soft-shadow">
+            加载更多研究成果
           </button>
         </div>
+      </section>
+
+      <!-- 实时模拟实验区 -->
+      <section class="py-16 px-4 max-w-7xl mx-auto">
+        <div class="bg-gradient-to-br from-indigo-600 to-purple-700 rounded-3xl p-8 md:p-12 text-white relative overflow-hidden">
+          <!-- 背景装饰 -->
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
+          <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl -ml-32 -mb-32"></div>
+
+          <div class="relative z-10">
+            <div class="text-center mb-10">
+              <h2 class="text-3xl font-bold mb-4">贝叶斯优化实时模拟</h2>
+              <p class="text-indigo-100 max-w-2xl mx-auto">
+                体验AI如何通过主动学习在50次迭代内逼近最优离子电导率。
+                观察采集函数如何平衡探索高不确定性区域与利用已知高性能区域。
+              </p>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+              <!-- 控制面板 -->
+              <div class="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                <h3 class="font-semibold mb-6 flex items-center">
+                  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"/></svg>
+                  参数设置
+                </h3>
+
+                <div class="space-y-6">
+                  <div>
+                    <label class="flex justify-between text-sm mb-2">
+                      <span>目标电导率 (mS/cm)</span>
+                      <span id="target-display" class="font-mono font-bold">10.0</span>
+                    </label>
+                    <input type="range" min="1" max="25" value="10" step="0.5" 
+                           class="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+                           id="target-slider" oninput="updateTarget(this.value)">
+                    <div class="flex justify-between text-xs text-indigo-200 mt-1">
+                      <span>1</span>
+                      <span>25</span>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label class="flex justify-between text-sm mb-2">
+                      <span>探索权重 (β)</span>
+                      <span id="beta-display" class="font-mono font-bold">2.0</span>
+                    </label>
+                    <input type="range" min="0" max="5" value="2" step="0.1" 
+                           class="w-full h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-white"
+                           id="beta-slider" oninput="updateBeta(this.value)">
+                    <p class="text-xs text-indigo-200 mt-2">更高值倾向于探索未知区域</p>
+                  </div>
+
+                  <div class="pt-4 border-t border-white/20">
+                    <div class="flex gap-3">
+                      <button onclick="startSimulation()" id="start-btn"
+                              class="flex-1 bg-white text-indigo-600 py-3 rounded-xl font-semibold hover:bg-indigo-50 transition">
+                        启动优化
+                      </button>
+                      <button onclick="resetSimulation()" 
+                              class="px-4 py-3 border border-white/30 rounded-xl hover:bg-white/10 transition">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 实时状态 -->
+                <div class="mt-6 space-y-3">
+                  <div class="flex justify-between text-sm">
+                    <span class="text-indigo-200">当前迭代</span>
+                    <span id="iter-count">0 / 50</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-indigo-200">最优电导率</span>
+                    <span id="best-cond" class="font-mono font-bold text-green-300">-</span>
+                  </div>
+                  <div class="flex justify-between text-sm">
+                    <span class="text-indigo-200">最佳候选</span>
+                    <span id="best-mat" class="font-mono">-</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- 图表区 -->
+              <div class="lg:col-span-2 bg-white rounded-2xl p-6">
+                <div class="h-80 w-full">
+                  <canvas id="optChart"></canvas>
+                </div>
+                <div class="mt-4 flex items-center justify-center gap-6 text-sm text-slate-600">
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-indigo-400"></span>
+                    <span>已探索样品</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span>当前最优</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="w-8 h-0.5 bg-purple-400 border-t border-dashed border-purple-400"></span>
+                    <span>目标线</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 技术对比 -->
+      <section class="py-12 px-4 max-w-7xl mx-auto">
+        <div class="bg-white rounded-3xl soft-shadow border border-slate-200 p-8">
+          <h2 class="text-2xl font-bold text-slate-800 mb-8 text-center">研究方法效率对比</h2>
+          <div class="h-96">
+            <canvas id="compareChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Footer -->
+      <footer class="bg-white border-t border-slate-200 mt-20 py-12">
+        <div class="max-w-7xl mx-auto px-4 text-center">
+          <div class="flex items-center justify-center space-x-3 mb-4">
+            <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">AI</div>
+            <span class="font-semibold text-slate-800">AI4Science Platform</span>
+          </div>
+          <p class="text-slate-500 text-sm mb-2">基于第五范式构建的智能化材料发现系统</p>
+          <p class="text-slate-400 text-xs">数据来源：Nature, npj Computational Materials, ACS Energy Letters (2024-2025)</p>
+        </div>
+      </footer>
+
+      <!-- 详情模态框 -->
+      <div id="detailModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full max-h-[90vh] overflow-y-auto soft-shadow">
+          <div class="p-8">
+            <div class="flex justify-between items-start mb-6">
+              <div id="modal-header"></div>
+              <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+              </button>
+            </div>
+            <div id="modal-body" class="prose prose-slate max-w-none"></div>
+          </div>
+        </div>
+      </div>
     </main>
   </div>
 
@@ -408,6 +706,290 @@
   <script src="assets/js/config.js?v=1"></script>
   <script src="assets/js/main.js?v=7"></script>
   <script>
+    // 图表初始化
+    let optChart = null;
+    let compareChart = null;
+    let simInterval = null;
+    let currentIter = 0;
+    let bestY = 0;
+    const maxIter = 50;
+    const materials = ['Li₃BiS₃', 'Li₆PS₅Cl', 'Li-M-Cl', 'Li-Na', 'LLZO', 'LGPS', 'Li₇P₃S₁₁', 'Li₃YCl₆'];
+
+    function initCharts() {
+      // 优化曲线图
+      const ctx1 = document.getElementById('optChart').getContext('2d');
+      optChart = new Chart(ctx1, {
+        type: 'scatter',
+        data: {
+          datasets: [{
+            label: '已探索',
+            data: [],
+            backgroundColor: 'rgba(99, 102, 241, 0.6)',
+            borderColor: 'rgba(99, 102, 241, 1)',
+            pointRadius: 5
+          }, {
+            label: '最优',
+            data: [],
+            backgroundColor: 'rgba(34, 197, 94, 1)',
+            borderColor: 'rgba(34, 197, 94, 1)',
+            pointRadius: 7,
+            pointStyle: 'star'
+          }, {
+            label: '目标',
+            data: [{x:0, y:10}, {x:50, y:10}],
+            type: 'line',
+            borderColor: 'rgba(168, 85, 247, 0.6)',
+            borderDash: [5, 5],
+            pointRadius: 0,
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            x: {
+              title: { display: true, text: '迭代次数' },
+              grid: { color: '#f1f5f9' }
+            },
+            y: {
+              title: { display: true, text: '离子电导率 (mS/cm)' },
+              grid: { color: '#f1f5f9' },
+              min: 0,
+              max: 25
+            }
+          },
+          plugins: {
+            legend: { display: false }
+          }
+        }
+      });
+
+      // 对比柱状图
+      const ctx2 = document.getElementById('compareChart').getContext('2d');
+      compareChart = new Chart(ctx2, {
+        type: 'bar',
+        data: {
+          labels: ['候选空间探索', '实验迭代', '发现周期(月)', '研发成本'],
+          datasets: [{
+            label: '传统试错法',
+            data: [100, 1000, 100, 100],
+            backgroundColor: 'rgba(148, 163, 184, 0.8)',
+            borderRadius: 6
+          }, {
+            label: '第四范式(大数据)',
+            data: [30, 300, 30, 40],
+            backgroundColor: 'rgba(59, 130, 246, 0.8)',
+            borderRadius: 6
+          }, {
+            label: '第五范式(AI4S)',
+            data: [5, 50, 5, 15],
+            backgroundColor: 'rgba(99, 102, 241, 0.8)',
+            borderRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          plugins: {
+            legend: { position: 'top' }
+          },
+          scales: {
+            x: {
+              title: { display: true, text: '相对工作量 (%)' },
+              grid: { color: '#f1f5f9' }
+            },
+            y: {
+              grid: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    function updateTarget(val) {
+      document.getElementById('target-display').textContent = val;
+      if (optChart) {
+        optChart.data.datasets[2].data = [{x:0, y:val}, {x:50, y:val}];
+        optChart.update();
+      }
+    }
+
+    function updateBeta(val) {
+      document.getElementById('beta-display').textContent = val;
+    }
+
+    function startSimulation() {
+      if (simInterval) return;
+      resetSimulation();
+
+      const target = parseFloat(document.getElementById('target-slider').value);
+      const beta = parseFloat(document.getElementById('beta-slider').value);
+
+      document.getElementById('start-btn').textContent = '优化中...';
+      document.getElementById('start-btn').disabled = true;
+
+      simInterval = setInterval(() => {
+        currentIter++;
+
+        // 模拟贝叶斯优化过程：前期探索(random)，后期利用(converge)
+        let base = 2 + (currentIter / maxIter) * (target * 0.8);
+        let noise = (Math.random() - 0.5) * (5 - currentIter/maxIter * 4); // 随迭代减小噪声
+        let y = Math.max(0.5, base + noise);
+
+        if (y > bestY) {
+          bestY = y;
+          document.getElementById('best-cond').textContent = bestY.toFixed(2) + ' mS/cm';
+          document.getElementById('best-mat').textContent = materials[Math.floor(Math.random() * materials.length)];
+        }
+
+        optChart.data.datasets[0].data.push({x: currentIter, y: y});
+        optChart.data.datasets[1].data = [{x: currentIter, y: bestY}];
+        optChart.update();
+
+        document.getElementById('iter-count').textContent = `${currentIter} / ${maxIter}`;
+
+        if (currentIter >= maxIter) {
+          clearInterval(simInterval);
+          simInterval = null;
+          document.getElementById('start-btn').textContent = '完成';
+          setTimeout(() => {
+            document.getElementById('start-btn').textContent = '启动优化';
+            document.getElementById('start-btn').disabled = false;
+          }, 2000);
+        }
+      }, 300);
+    }
+
+    function resetSimulation() {
+      if (simInterval) {
+        clearInterval(simInterval);
+        simInterval = null;
+      }
+      currentIter = 0;
+      bestY = 0;
+      optChart.data.datasets[0].data = [];
+      optChart.data.datasets[1].data = [];
+      optChart.update();
+      document.getElementById('iter-count').textContent = '0 / 50';
+      document.getElementById('best-cond').textContent = '-';
+      document.getElementById('best-mat').textContent = '-';
+      document.getElementById('start-btn').textContent = '启动优化';
+      document.getElementById('start-btn').disabled = false;
+    }
+
+    // 模态框内容
+    const details = {
+      'li3bis3': {
+        header: '<div><span class="text-sm text-indigo-600 font-semibold">硫化物超离子导体</span><h3 class="text-2xl font-bold text-slate-800 mt-1">Li₃BiS₃ 机器学习辅助发现</h3></div>',
+        body: `
+          <div class="space-y-4 text-slate-600">
+            <div class="bg-blue-50 rounded-xl p-4 border border-blue-100">
+              <h4 class="font-semibold text-blue-900 mb-2">核心创新点</h4>
+              <p class="text-sm">首次将CNN预筛选与分子动力学(MD)分层结合，利用ML-IAP(机器学习原子间势)替代昂贵的DFT计算，将候选材料评估速度提升1000倍。</p>
+            </div>
+
+            <div class="grid grid-cols-3 gap-4 my-6">
+              <div class="text-center p-3 bg-slate-50 rounded-lg">
+                <div class="text-2xl font-bold text-indigo-600">1.4</div>
+                <div class="text-xs text-slate-500">mS/cm (25°C)</div>
+              </div>
+              <div class="text-center p-3 bg-slate-50 rounded-lg">
+                <div class="text-2xl font-bold text-indigo-600">300</div>
+                <div class="text-xs text-slate-500">°C 合成温度</div>
+              </div>
+              <div class="text-center p-3 bg-slate-50 rounded-lg">
+                <div class="text-2xl font-bold text-indigo-600">0.28</div>
+                <div class="text-xs text-slate-500">eV 迁移能垒</div>
+              </div>
+            </div>
+
+            <h4 class="font-semibold text-slate-800">AI方法细节</h4>
+            <ul class="list-disc pl-5 space-y-2 text-sm">
+              <li><strong>阶段1-CNN预筛选：</strong>利用卷积神经网络处理晶体结构图像，从20,717种含锂材料中快速过滤不稳定相。</li>
+              <li><strong>阶段2-随机森林：</strong>基于距离统计特征训练RF模型，识别潜在快离子导体，准确率>85%。</li>
+              <li><strong>阶段3-SVR预测：</strong>支持向量回归预测Li⁺迁移能垒，筛选出12种最优候选。</li>
+              <li><strong>阶段4-MD验证：</strong>使用ML-IAP进行分子动力学模拟，验证高电导率与结构稳定性。</li>
+            </ul>
+
+            <div class="mt-6 pt-6 border-t border-slate-200">
+              <p class="text-sm text-slate-500">来源：Chen et al., Journal of Materials Chemistry A, 2024</p>
+            </div>
+          </div>
+        `
+      },
+      'halide': {
+        header: '<div><span class="text-sm text-purple-600 font-semibold">卤化物电解质</span><h3 class="text-2xl font-bold text-slate-800 mt-1">几何-动力学描述符筛选策略</h3></div>',
+        body: `
+          <div class="space-y-4 text-slate-600">
+            <p>针对反钙钛矿结构卤化物，研究团队开发了结合几何描述符(t)与动力学描述符(η)的机器学习模型，成功预测高电压稳定性固态电解质。</p>
+
+            <h4 class="font-semibold text-slate-800 mt-4">技术优势</h4>
+            <ul class="list-disc pl-5 space-y-2 text-sm">
+              <li>电化学窗口扩展至4.3V，兼容高电压正极材料</li>
+              <li>湿度稳定性显著优于硫化物体系</li>
+              <li>良好的可变形性，界面接触阻抗<20 Ω·cm²</li>
+            </ul>
+
+            <div class="bg-purple-50 rounded-xl p-4 border border-purple-100 mt-4">
+              <h4 class="font-semibold text-purple-900 mb-2 text-sm">Bond Valence + GNN 方法</h4>
+              <p class="text-sm">利用键价法计算Li⁺能量景观，结合图神经网络学习局部配位环境对离子迁移的影响，构建三维传导网络预测模型。</p>
+            </div>
+          </div>
+        `
+      },
+      'lina': {
+        header: '<div><span class="text-sm text-orange-600 font-semibold">颠覆性发现</span><h3 class="text-2xl font-bold text-slate-800 mt-1">Li-Na混合离子导体</h3></div>',
+        body: `
+          <div class="space-y-4 text-slate-600">
+            <div class="bg-orange-50 rounded-xl p-4 border border-orange-100">
+              <p class="text-sm font-semibold text-orange-800">突破性意义：证明Li⁺/Na⁺协同输运可抑制枝晶生长，同时降低70%锂资源消耗，为低成本固态电池提供新路径。</p>
+            </div>
+
+            <h4 class="font-semibold text-slate-800">技术路径</h4>
+            <p class="text-sm">Microsoft Azure Quantum Elements平台：</p>
+            <ol class="list-decimal pl-5 space-y-2 text-sm mt-2">
+              <li>DFT高通量计算生成3200万种无机物数据</li>
+              <li>筛选离子电导率>1 mS/cm的候选者</li>
+              <li>分子动力学验证混合离子稳定性</li>
+              <li>PNNL实验验证合成可行性</li>
+            </ol>
+
+            <div class="grid grid-cols-2 gap-4 mt-4">
+              <div class="p-3 bg-slate-50 rounded-lg text-center">
+                <div class="text-2xl font-bold text-orange-600">80h</div>
+                <div class="text-xs text-slate-500">计算时间</div>
+              </div>
+              <div class="p-3 bg-slate-50 rounded-lg text-center">
+                <div class="text-2xl font-bold text-orange-600">3200万</div>
+                <div class="text-xs text-slate-500">筛选材料数</div>
+              </div>
+            </div>
+          </div>
+        `
+      }
+    };
+
+    function showDetail(id) {
+      const modal = document.getElementById('detailModal');
+      const header = document.getElementById('modal-header');
+      const body = document.getElementById('modal-body');
+
+      if (details[id]) {
+        header.innerHTML = details[id].header;
+        body.innerHTML = details[id].body;
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('detailModal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
     // 加载统计数据
     async function loadStats() {
       try {
@@ -437,8 +1019,9 @@
 
     // 页面加载时执行
     document.addEventListener('DOMContentLoaded', function() {
+      initCharts();
       loadStats();
-      console.log('材料预测页面已初始化');
+      console.log('第五范式材料发现平台已初始化');
     });
   </script>
 </body>
